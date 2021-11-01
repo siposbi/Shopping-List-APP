@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/shoppingListFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_loginFragment_to_shoppingListFragment"
+            app:destination="@id/shoppingListFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register">
+        <argument
+            android:name="email"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="password"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/shoppingListFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.ShoppingListFragment"
+        android:label="Shopping Lists"
+        tools:layout="@layout/fragment_shopping_list">
+        <action
+            android:id="@+id/action_shoppingListFragment_to_productListFragment"
+            app:destination="@id/productListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_shoppingListFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/shoppingListFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/exportFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.ExportFragment"
+        android:label="Export: {shoppingListName}"
+        tools:layout="@layout/fragment_export">
+        <argument
+            android:name="shoppingListName"
+            app:argType="string" />
+        <argument
+            android:name="shoppingListId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/memberListFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.MemberListFragment"
+        android:label="Members: {shoppingListName}"
+        tools:layout="@layout/fragment_member_list">
+        <argument
+            android:name="shoppingListName"
+            app:argType="string" />
+        <argument
+            android:name="shoppingListId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/productListFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.ProductListFragment"
+        android:label="{shoppingListName}"
+        tools:layout="@layout/fragment_product_list">
+        <action
+            android:id="@+id/action_productListFragment_to_memberListFragment"
+            app:destination="@id/memberListFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_bottom"
+            app:popEnterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_top" />
+        <action
+            android:id="@+id/action_productListFragment_to_exportFragment"
+            app:destination="@id/exportFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_bottom"
+            app:popEnterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_top" />
+        <argument
+            android:name="shoppingListName"
+            app:argType="string" />
+        <argument
+            android:name="shoppingListId"
+            app:argType="long" />
+    </fragment>
+</navigation>

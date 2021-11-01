@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="?attr/minTouchTargetSize"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/ivOwner"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/image_view_is_bought_content_description"
+        android:src="@drawable/ic_twotone_tag_faces_24" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/item_user_first_last_name"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            tools:text="Balázs Sipos" />
+
+        <TextView
+            android:id="@+id/tvJoinDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/item_user_join_date"
+            android:textAppearance="?attr/textAppearanceCaption"
+            tools:text="Joined: 2021.10.18." />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tvIsOwner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/item_user_is_owner"
+        android:textAppearance="?attr/textAppearanceCaption" />
+
+</LinearLayout>
