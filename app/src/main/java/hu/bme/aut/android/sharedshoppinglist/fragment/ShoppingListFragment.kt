@@ -13,23 +13,26 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ShoppingListAdapter
+import hu.bme.aut.android.sharedshoppinglist.database.ShoppingListDao
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
 import hu.bme.aut.android.sharedshoppinglist.util.checkAndShowIfRequiredFilled
 import hu.bme.aut.android.sharedshoppinglist.util.clearErrorIfRequiredValid
 import hu.bme.aut.android.sharedshoppinglist.util.setPositiveButtonWithValidation
 import hu.bme.aut.android.sharedshoppinglist.util.setUserLoggedIn
-import kotlinx.android.synthetic.main.fragment_register.*
+import kotlinx.coroutines.*
 import java.time.LocalDateTime
 import kotlin.random.Random
 
 // TODO lista nevének hosszát ellenőrizni
 class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCardListener,
-    ShoppingListAdapter.OnInsertListener {
+    ShoppingListAdapter.OnInsertListener, CoroutineScope by MainScope() {
     private var _binding: FragmentShoppingListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ShoppingListAdapter
+    private lateinit var database: ShoppingListDao
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +40,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentShoppingListBinding.inflate(inflater, container, false)
+        database = ShoppingListApplication.shoppingListDatabase.shoppingListDao()
         return binding.root
     }
 
@@ -86,6 +90,13 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // TODO check if items loaded from network match this, if not show notifycation
+    private fun loadItemsInBackground() = launch {
+        val items = withContext(Dispatchers.IO) {
+            database.getAllShoppingLists()
+        }
     }
 
     private fun showJoinDialog() {
