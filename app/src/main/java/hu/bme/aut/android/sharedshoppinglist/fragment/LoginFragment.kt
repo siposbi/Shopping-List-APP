@@ -7,18 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.fragment.findNavController
-import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentLoginBinding
 import hu.bme.aut.android.sharedshoppinglist.util.setUserLoggedIn
 
 class LoginFragment : Fragment() {
-    companion object {
-        const val LOGIN_SUCCESSFUL: String = "LOGIN_SUCCESSFUL"
-    }
-
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var savedStateHandle: SavedStateHandle
 
     override fun onCreateView(
         inflater: LayoutInflater,

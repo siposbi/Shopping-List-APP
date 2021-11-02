@@ -48,29 +48,29 @@ class MemberListFragment : Fragment() {
                 Random.nextLong(1000),
                 "FN${Random.nextInt(10)}",
                 "LN${Random.nextInt(10)}",
-                true,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                true
             ),
             Member(
                 Random.nextLong(1000),
                 "FN${Random.nextInt(10)}",
                 "LN${Random.nextInt(10)}",
-                false,
-                LocalDateTime.now().minusDays(1)
+                LocalDateTime.now().minusDays(1),
+                false
             ),
             Member(
                 Random.nextLong(1000),
                 "FN${Random.nextInt(10)}",
                 "LN${Random.nextInt(10)}",
-                false,
-                LocalDateTime.now().minusDays(2)
+                LocalDateTime.now().minusDays(2),
+                false
             ),
             Member(
                 Random.nextLong(1000),
                 "FN${Random.nextInt(10)}",
                 "LN${Random.nextInt(10)}",
-                false,
-                LocalDateTime.now().minusDays(3)
+                LocalDateTime.now().minusDays(3),
+                false
             ),
         )
     }

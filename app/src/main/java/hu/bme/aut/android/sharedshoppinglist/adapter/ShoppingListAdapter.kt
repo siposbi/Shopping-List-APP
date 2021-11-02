@@ -2,9 +2,6 @@ package hu.bme.aut.android.sharedshoppinglist.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,11 +34,11 @@ class ShoppingListAdapter :
         if (shoppingList.isShared) {
             holder.binding.ivIsSharedImage.setImageResource(R.drawable.ic_baseline_group_48)
         }
-        holder.binding.tvName.text = shoppingList.Name
+        holder.binding.tvName.text = shoppingList.name
         holder.binding.tvCreatedAt.text =
-            shoppingList.CreatedAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
+            shoppingList.createdDateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
         holder.binding.tvEditedAt.text =
-            shoppingList.LastEditedAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
+            shoppingList.lastEditedDateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
     }
 
     fun setShoppingLists(shoppingLists: List<ShoppingList>) {
@@ -84,9 +81,9 @@ class ShoppingListAdapter :
                     itemCardListener?.onDeleteClick(it, absoluteAdapterPosition)
                 }
             }
-            binding.tvName.setOnLongClickListener {
+            itemView.setOnLongClickListener {
                 shoppingList?.let {
-                    itemCardListener?.onNameLongClock(
+                    itemCardListener?.onItemLongClick(
                         it.copy(),
                         absoluteAdapterPosition
                     )
@@ -100,7 +97,7 @@ class ShoppingListAdapter :
         fun onItemClick(shoppingList: ShoppingList)
         fun onShareClick(shoppingList: ShoppingList)
         fun onDeleteClick(shoppingList: ShoppingList, position: Int)
-        fun onNameLongClock(shoppingList: ShoppingList, index: Int)
+        fun onItemLongClick(shoppingList: ShoppingList, index: Int)
     }
 
     interface OnInsertListener {
@@ -110,11 +107,11 @@ class ShoppingListAdapter :
     companion object {
         object itemCallback : DiffUtil.ItemCallback<ShoppingList>() {
             override fun areItemsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-                return oldItem.ID == newItem.ID
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-                return oldItem.Name == newItem.Name
+                return oldItem.name == newItem.name
             }
         }
     }

@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_register.*
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-
+// TODO lista nevének hosszát ellenőrizni
 class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCardListener,
     ShoppingListAdapter.OnInsertListener {
     private var _binding: FragmentShoppingListBinding? = null
@@ -145,9 +145,10 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
             val id = Random.nextLong(1000)
             adapter.addShoppingList(
                 ShoppingList(
-                    id, Random.nextBoolean(), name!!, "SC$id",
+                    id, name!!, 0,"SC$id",
                     LocalDateTime.now().minusHours(Random.nextLong(168)),
-                    LocalDateTime.now().plusHours(Random.nextLong(168))
+                    LocalDateTime.now().plusHours(Random.nextLong(168)),
+                    Random.nextBoolean()
                 )
             )
 
@@ -162,44 +163,48 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
         return listOf(
             ShoppingList(
                 1,
-                false,
                 "First",
+                1,
                 "SC001",
                 LocalDateTime.now().minusDays(1),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                true
             ),
             ShoppingList(
                 2,
-                true,
                 "Second",
+                2,
                 "SC002",
-                LocalDateTime.now().minusDays(1).plusHours(1),
-                LocalDateTime.now().plusHours(1)
+                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(),
+                true
             ),
             ShoppingList(
                 3,
-                true,
                 "Third",
+                1,
                 "SC003",
-                LocalDateTime.now().minusDays(1).plusHours(2),
-                LocalDateTime.now().plusHours(2)
+                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(),
+                false
             ),
             ShoppingList(
                 4,
-                false,
                 "Fourth",
+                1,
                 "SC004",
-                LocalDateTime.now().minusDays(1).plusHours(3),
-                LocalDateTime.now().plusHours(3)
+                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(),
+                false
             ),
         )
     }
 
     override fun onItemClick(shoppingList: ShoppingList) {
-        Log.i("SL_A", "CLICK ${shoppingList.ID}")
+        Log.i("SL_A", "CLICK ${shoppingList.id}")
         val action = ShoppingListFragmentDirections.actionShoppingListFragmentToProductListFragment(
-            shoppingListName = shoppingList.Name,
-            shoppingListId = shoppingList.ID
+            shoppingListName = shoppingList.name,
+            shoppingListId = shoppingList.id
         )
         findNavController().navigate(action)
     }
@@ -207,13 +212,13 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
     override fun onShareClick(shoppingList: ShoppingList) {
         val clipboardManager =
             requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = ClipData.newPlainText("Shopping List join code", shoppingList.ShareCode)
+        val clipData = ClipData.newPlainText("Shopping List join code", shoppingList.shareCode)
         clipboardManager.setPrimaryClip(clipData)
 
         Snackbar.make(binding.root, R.string.share_code_copied, Snackbar.LENGTH_SHORT)
             .setAnchorView(binding.fabExpandable).show()
 
-        Log.i("SL_A", "SHARE ${shoppingList.ID}")
+        Log.i("SL_A", "SHARE ${shoppingList.id}")
     }
 
     override fun onDeleteClick(shoppingList: ShoppingList, position: Int) {
@@ -227,15 +232,15 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
                 adapter.addShoppingList(shoppingList, position)
             }.show()
 
-        Log.i("SL_A", "DELETE ${shoppingList.ID}")
+        Log.i("SL_A", "DELETE ${shoppingList.id}")
     }
 
-    override fun onNameLongClock(shoppingList: ShoppingList, index: Int) {
+    override fun onItemLongClick(shoppingList: ShoppingList, index: Int) {
         val dialogBuilder = MaterialAlertDialogBuilder(requireContext())
             .setTitle(
                 getString(
                     R.string.alert_dialog_rename_shopping_list_title,
-                    shoppingList.Name
+                    shoppingList.name
                 )
             )
             .setView(R.layout.dialog_input_shopping_list_rename)
@@ -248,7 +253,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
         dialogBuilder.show()
 
         (dialogBuilder as? AlertDialog)?.findViewById<TextInputLayout>(R.id.etShoppingListRename)?.editText?.setText(
-            shoppingList.Name
+            shoppingList.name
         )
 
         dialogBuilder.setPositiveButtonWithValidation {
@@ -261,14 +266,14 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
                 return@setPositiveButtonWithValidation
             }
             val newName = textInputLayout.editText?.text?.toString()
-            if (newName == shoppingList.Name) {
+            if (newName == shoppingList.name) {
                 dialogBuilder.dismiss()
                 return@setPositiveButtonWithValidation
             }
 
             // TODO Save with database
 
-            shoppingList.Name = newName!!
+//            shoppingList.name = newName!!
             adapter.updateShoppingListWithIndex(shoppingList, index)
 
 

@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.*
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.CalendarConstraints
@@ -81,35 +80,41 @@ class ExportFragment : Fragment() {
     private fun getExports(): List<Export> {
         return listOf(
             Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
+                Random.nextLong(),
                 "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
+                "LN${Random.nextInt(10)}",
+                Random.nextLong(-2000, 2000),
             ),
             Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
+                Random.nextLong(),
                 "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
+                "LN${Random.nextInt(10)}",
+                Random.nextLong(-2000, 2000),
             ),
             Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
+                Random.nextLong(),
                 "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
+                "LN${Random.nextInt(10)}",
+                Random.nextLong(-2000, 2000),
             ),
             Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
+                Random.nextLong(),
                 "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
+                "LN${Random.nextInt(10)}",
+                Random.nextLong(-2000, 2000),
             ),
             Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
+                Random.nextLong(),
                 "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
-            )
+                "LN${Random.nextInt(10)}",
+                Random.nextLong(-2000, 2000),
+            ),
+            Export(
+                Random.nextLong(),
+                "FN${Random.nextInt(10)}",
+                "LN${Random.nextInt(10)}",
+                Random.nextLong(-2000, 2000),
+            ),
         )
     }
 

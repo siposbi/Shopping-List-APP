@@ -3,8 +3,6 @@ package hu.bme.aut.android.sharedshoppinglist.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +28,7 @@ class MemberAdapter(private val context: Context) :
             context.getString(R.string.item_user_first_last_name, member.firstName, member.lastName)
         holder.binding.tvIsOwner.text =
             if (member.isOwner) context.getString(R.string.item_user_is_owner) else ""
-        val joinDateString = member.joinDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+        val joinDateString = member.joinDateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
         holder.binding.tvJoinDate.text = context.getString(R.string.item_user_join_date, joinDateString)
     }
 
@@ -47,7 +45,7 @@ class MemberAdapter(private val context: Context) :
     companion object {
         object itemCallback : DiffUtil.ItemCallback<Member>() {
             override fun areItemsTheSame(oldItem: Member, newItem: Member): Boolean {
-                return oldItem.ID == newItem.ID
+                return oldItem.userId == newItem.userId
             }
 
             override fun areContentsTheSame(oldItem: Member, newItem: Member): Boolean {

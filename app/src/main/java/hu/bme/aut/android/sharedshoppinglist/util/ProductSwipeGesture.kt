@@ -2,14 +2,10 @@ package hu.bme.aut.android.sharedshoppinglist.util
 
 import android.content.Context
 import android.graphics.Canvas
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.android.sharedshoppinglist.R
-import hu.bme.aut.android.sharedshoppinglist.adapter.ProductAdapter
-import hu.bme.aut.android.sharedshoppinglist.model.Product
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
 

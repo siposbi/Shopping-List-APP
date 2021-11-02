@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,11 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputLayout
-import hu.bme.aut.android.sharedshoppinglist.MainActivity
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.adapter.ProductAdapter
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentProductListBinding
-import hu.bme.aut.android.sharedshoppinglist.model.Product
+import hu.bme.aut.android.sharedshoppinglist.model.ProductMinimal
 import hu.bme.aut.android.sharedshoppinglist.util.*
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -102,10 +100,11 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         R.id.action_view_members -> {
             // TODO viewmodel save
             Log.i("PRODUCT_A", "MEMBERS")
-            val action = ProductListFragmentDirections.actionProductListFragmentToMemberListFragment(
-                shoppingListName = args.shoppingListName,
-                shoppingListId = args.shoppingListId
-            )
+            val action =
+                ProductListFragmentDirections.actionProductListFragmentToMemberListFragment(
+                    shoppingListName = args.shoppingListName,
+                    shoppingListId = args.shoppingListId
+                )
             findNavController().navigate(action)
             true
         }
@@ -119,23 +118,25 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         _binding = null
     }
 
-    private fun getProducts(): List<Product> {
+    private fun getProducts(): List<ProductMinimal> {
         return listOf(
-            Product(
-                Random.nextLong(1000), Random.nextLong(1000),
-                "Name ${Random.nextLong(1000)}", Random.nextBoolean(),
-                Random.nextLong(1000), Random.nextLong(1000),
-                LocalDateTime.now().minusHours(Random.nextLong(168)),
-                LocalDateTime.now().plusHours(Random.nextLong(168)),
-                1, null
+            ProductMinimal(
+                Random.nextLong(1000),
+                "Name ${Random.nextLong(1000)}",
+                "Name ${Random.nextLong(1000)}",
+                "Name ${Random.nextLong(1000)}",
+                Random.nextLong(1000),
+                Random.nextBoolean(),
+                Random.nextBoolean()
             ),
-            Product(
-                Random.nextLong(1000), Random.nextLong(1000),
-                "Name ${Random.nextLong(1000)}", Random.nextBoolean(),
-                Random.nextLong(1000), Random.nextLong(1000),
-                LocalDateTime.now().minusHours(Random.nextLong(168)),
-                LocalDateTime.now().plusHours(Random.nextLong(168)),
-                1, null
+            ProductMinimal(
+                Random.nextLong(1000),
+                "Name ${Random.nextLong(1000)}",
+                "Name ${Random.nextLong(1000)}",
+                "Name ${Random.nextLong(1000)}",
+                Random.nextLong(1000),
+                Random.nextBoolean(),
+                Random.nextBoolean()
             ),
         )
     }
@@ -144,23 +145,31 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         binding.rvProducts.smoothScrollToPosition(0)
     }
 
-    // TODO
-    override fun onItemLongClick(product: Product) {
+    // TODO edit
+    override fun onItemLongClick(product: ProductMinimal) {
         // TODO CHANGE USER ID
-        if (product.AddedByID != 2L) {
-            showSnackBarFromAdapter(R.string.you_cant_edit)
-        }
+//        if (product.AddedByID != 2L) {
+//            showSnackBarFromAdapter(R.string.you_cant_edit)
+//        }
 
         // TODO SHOW MODAL, SHAVE CHANGE, UPDATE VIEW IF SUCCESSFUL
 
-        Log.i("PRODUCT_A", "LONG CLICK ${product.Name}")
+        Log.i("PRODUCT_A", "LONG CLICK ${product.name}")
         product.let {
-            Log.i("PRODUCT_A", "${product.Name} PURCHASED BY ${product.BoughtByID}")
+//            Log.i("PRODUCT_A", "${product.name} PURCHASED BY ${product.BoughtByID}")
         }
     }
 
+    override fun onItemClicked(product: ProductMinimal) {
+        val action = ProductListFragmentDirections.actionProductListFragmentToProductDetailFragment(
+            productId = product.id,
+            productName = product.name
+        )
+        findNavController().navigate(action)
+    }
+
     // TODO Actually delete, if error, return false
-    override fun onItemDelete(product: Product, position: Int): Boolean {
+    override fun onItemDelete(product: ProductMinimal, position: Int): Boolean {
         binding.root.showSnackBar(
             title = R.string.shopping_list_deleted,
             anchor = binding.favAddProduct,
@@ -170,16 +179,16 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
             }
         )
 
-        Log.i("PRODUCT_A", "DELETED ${product.Name}")
+        Log.i("PRODUCT_A", "DELETED ${product.name}")
         return true
     }
 
-    override fun onItemPurchased(product: Product): Boolean {
+    override fun onItemPurchased(product: ProductMinimal): Boolean {
         // TODO SEND PURCHASE TO SERVER
         return true
     }
 
-    override fun onItemPurchasedUndo(product: Product): Boolean {
+    override fun onItemPurchasedUndo(product: ProductMinimal): Boolean {
         // TODO SEND UNDO PURCHASE TO SERVER
         return true
     }
@@ -236,13 +245,14 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
             )).toLong()
 
             // TODO Save with database, change data
-            val product = Product(
-                Random.nextLong(1000), Random.nextLong(1000),
-                name, isShared,
-                priceAsLong, priceAsLong,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusHours(Random.nextLong(168)),
-                1, null
+            val product = ProductMinimal(
+                Random.nextLong(1000),
+                "Name ${Random.nextLong(1000)}",
+                "Name ${Random.nextLong(1000)}",
+                "Name ${Random.nextLong(1000)}",
+                Random.nextLong(1000),
+                Random.nextBoolean(),
+                Random.nextBoolean()
             )
 
             adapter.addProduct(product)
