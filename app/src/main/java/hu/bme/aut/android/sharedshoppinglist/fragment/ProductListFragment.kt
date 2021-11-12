@@ -18,7 +18,6 @@ import hu.bme.aut.android.sharedshoppinglist.adapter.ProductAdapter
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentProductListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ProductMinimal
 import hu.bme.aut.android.sharedshoppinglist.util.*
-import java.time.LocalDateTime
 import kotlin.random.Random
 
 class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
@@ -214,8 +213,12 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
                 (dialogBuilder as? AlertDialog)?.findViewById<TextInputLayout>(R.id.etProductName)
             etProductName?.editText?.doAfterTextChanged {
                 etProductName.clearErrorIfRequiredValid(requireActivity())
+                etProductName.clearErrorIfLengthValid(requireContext(), 30)
             }
             if (!etProductName!!.checkAndShowIfRequiredFilled(requireActivity())) {
+                return@setPositiveButtonWithValidation
+            }
+            if (!etProductName.checkAndShowIfLengthValid(requireActivity(), 30)) {
                 return@setPositiveButtonWithValidation
             }
 

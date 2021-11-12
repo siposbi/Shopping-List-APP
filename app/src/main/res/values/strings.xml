@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Shared Shopping List</string>
+    <string name="app_name">Shopping List</string>
     <string name="cd_loading">LOADING</string>
     <string name="login_button">LOGIN</string>
     <string name="password_edit_text">Password</string>
@@ -65,4 +65,5 @@
     <string name="alert_dialog_add_product">Add product</string>
     <string name="alertdialog_add">Add</string>
     <string name="action_save_export">Save as JSON</string>
+    <string name="max_length">Value too long</string>
 </resources>

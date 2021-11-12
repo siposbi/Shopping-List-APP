@@ -18,10 +18,7 @@ import hu.bme.aut.android.sharedshoppinglist.adapter.ShoppingListAdapter
 import hu.bme.aut.android.sharedshoppinglist.database.ShoppingListDao
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
-import hu.bme.aut.android.sharedshoppinglist.util.checkAndShowIfRequiredFilled
-import hu.bme.aut.android.sharedshoppinglist.util.clearErrorIfRequiredValid
-import hu.bme.aut.android.sharedshoppinglist.util.setPositiveButtonWithValidation
-import hu.bme.aut.android.sharedshoppinglist.util.setUserLoggedIn
+import hu.bme.aut.android.sharedshoppinglist.util.*
 import kotlinx.coroutines.*
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -92,7 +89,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
         _binding = null
     }
 
-    // TODO check if items loaded from network match this, if not show notifycation
+    // TODO check if items loaded from network match this, if not show dialog
     private fun loadItemsInBackground() = launch {
         val items = withContext(Dispatchers.IO) {
             database.getAllShoppingLists()
@@ -269,11 +266,15 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
 
         dialogBuilder.setPositiveButtonWithValidation {
             val textInputLayout =
-                (dialogBuilder as? AlertDialog)?.findViewById<TextInputLayout>(R.id.etShoppingListRename)
-            textInputLayout?.editText?.doAfterTextChanged {
+                (dialogBuilder as? AlertDialog)?.findViewById<TextInputLayout>(R.id.etShoppingListRename)!!
+            textInputLayout.editText?.doAfterTextChanged {
                 textInputLayout.clearErrorIfRequiredValid(requireActivity())
+                textInputLayout.clearErrorIfLengthValid(requireContext(), 20)
             }
-            if (!textInputLayout!!.checkAndShowIfRequiredFilled(requireActivity())) {
+            if (!textInputLayout.checkAndShowIfRequiredFilled(requireActivity())) {
+                return@setPositiveButtonWithValidation
+            }
+            if (!textInputLayout.checkAndShowIfLengthValid(requireActivity(), 20)) {
                 return@setPositiveButtonWithValidation
             }
             val newName = textInputLayout.editText?.text?.toString()

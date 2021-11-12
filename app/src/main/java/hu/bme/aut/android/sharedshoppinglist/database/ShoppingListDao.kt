@@ -15,7 +15,7 @@ interface ShoppingListDao {
     fun getAllShoppingLists(): List<RoomShoppingList>
 
     @Update
-    fun updateShoppingList(shoppingList: RoomShoppingList): Long
+    fun updateShoppingList(shoppingList: RoomShoppingList)
 
     @Query("UPDATE shopping_list SET numberOfProducts = :numberOfProducts WHERE id = :id")
     fun updateShoppingList(id: Long, numberOfProducts: Long)

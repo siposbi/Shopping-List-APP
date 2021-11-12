@@ -18,3 +18,17 @@ fun TextInputLayout.checkAndShowIfRequiredFilled(context: Context): Boolean {
     this.error = context.getString(R.string.required_error)
     return false
 }
+
+fun TextInputLayout.clearErrorIfLengthValid(context: Context, maximum: Int) {
+    if (this.error != null && checkAndShowIfLengthValid(context, maximum)) {
+        this.error = null
+    }
+}
+
+fun TextInputLayout.checkAndShowIfLengthValid(context: Context, maximum: Int): Boolean {
+    if (this.editText!!.text.toString().length <= maximum) {
+        return true
+    }
+    this.error = context.getString(R.string.max_length)
+    return false
+}
