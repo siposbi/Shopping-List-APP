@@ -7,11 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ShoppingListFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvShoppingLists"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/rlShoppingLists"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_shopping_list" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvShoppingLists"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_shopping_list" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.nambimobile.widgets.efab.ExpandableFabLayout
         android:layout_width="match_parent"

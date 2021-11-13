@@ -11,13 +11,18 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentRegisterBinding
+import hu.bme.aut.android.sharedshoppinglist.network.LoginModel
+import hu.bme.aut.android.sharedshoppinglist.network.RegisterModel
+import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.checkAndShowIfRequiredFilled
 import hu.bme.aut.android.sharedshoppinglist.util.clearErrorIfRequiredValid
+import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 
 class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
     private val args: RegisterFragmentArgs by navArgs()
+    private lateinit var apiClient: ShoppingListClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,6 +30,7 @@ class RegisterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 
@@ -39,7 +45,7 @@ class RegisterFragment : Fragment() {
         _binding = null
     }
 
-    private fun initForm(){
+    private fun initForm() {
         binding.etEmail.editText?.setText(args.email)
         binding.etPassword.editText?.setText(args.password)
 
@@ -51,10 +57,16 @@ class RegisterFragment : Fragment() {
             ) {
                 return@setOnClickListener
             }
-
-            // TODO Register via backend.
-
-            findNavController().navigateUp()
+            apiClient.register(
+                registerModel = RegisterModel(
+                    firstName = binding.etFirstName.editText?.text.toString(),
+                    lastName = binding.etLastName.editText?.text.toString(),
+                    email = binding.etEmail.editText?.text.toString(),
+                    password =binding.etPassword.editText?.text.toString()
+                ),
+                onSuccess = ::successfulRegistration,
+                onError = ::failedRegistration
+            )
         }
 
         binding.etPassword.editText?.doAfterTextChanged {
@@ -62,7 +74,6 @@ class RegisterFragment : Fragment() {
                 binding.etPassword.error = null
             }
         }
-
         binding.etFirstName.editText?.doAfterTextChanged {
             binding.etFirstName.clearErrorIfRequiredValid(requireActivity())
         }
@@ -80,6 +91,15 @@ class RegisterFragment : Fragment() {
         }
         textInput.error = getString(R.string.password_error)
         return false
+    }
+
+    private fun successfulRegistration(id: Long) {
+        showSnackBar("Successfully registered")
+        findNavController().navigateUp()
+    }
+
+    private fun failedRegistration(error: String) {
+        showSnackBar(error)
     }
 
 }

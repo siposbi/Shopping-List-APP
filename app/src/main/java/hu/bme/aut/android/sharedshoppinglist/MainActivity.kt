@@ -1,6 +1,5 @@
 package hu.bme.aut.android.sharedshoppinglist
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -9,7 +8,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import hu.bme.aut.android.sharedshoppinglist.databinding.ActivityMainBinding
-import hu.bme.aut.android.sharedshoppinglist.util.USER_LOGGED_IN_KEY
+import hu.bme.aut.android.sharedshoppinglist.network.SessionManager
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val isUserLoggedIn = getPreferences(Context.MODE_PRIVATE).getBoolean(USER_LOGGED_IN_KEY, false)
+        val isUserLoggedIn = SessionManager(this).getUserLoggedIn()
 
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment

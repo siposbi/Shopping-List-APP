@@ -16,8 +16,6 @@ class ShoppingListAdapter :
 
     private var shoppingListList = emptyList<ShoppingList>()
 
-    lateinit var onInsertListener: OnInsertListener
-
     var itemCardListener: ShoppingListItemCardListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -42,7 +40,7 @@ class ShoppingListAdapter :
     }
 
     fun setShoppingLists(shoppingLists: List<ShoppingList>) {
-        shoppingListList += shoppingLists
+        shoppingListList = shoppingLists
         submitList(shoppingListList)
     }
 
@@ -61,7 +59,7 @@ class ShoppingListAdapter :
         shoppingListList = tmpList
         submitList(shoppingListList)
         if (position == 0) {
-            onInsertListener.scrollToTop()
+            itemCardListener?.scrollToTop()
         }
     }
 
@@ -98,9 +96,6 @@ class ShoppingListAdapter :
         fun onShareClick(shoppingList: ShoppingList)
         fun onDeleteClick(shoppingList: ShoppingList, position: Int)
         fun onItemLongClick(shoppingList: ShoppingList, index: Int)
-    }
-
-    interface OnInsertListener {
         fun scrollToTop()
     }
 

@@ -5,14 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.fragment.findNavController
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentLoginBinding
-import hu.bme.aut.android.sharedshoppinglist.util.setUserLoggedIn
+import hu.bme.aut.android.sharedshoppinglist.network.LoginModel
+import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
+import hu.bme.aut.android.sharedshoppinglist.network.TokenModel
+import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+    private lateinit var apiClient: ShoppingListClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -20,6 +23,7 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 
@@ -27,10 +31,14 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, bundle)
 
         binding.btnLogin.setOnClickListener {
-            // TODO Login via backend.
-            requireActivity().setUserLoggedIn(true)
-            val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
-            findNavController().navigate(action)
+            apiClient.login(
+                loginModel = LoginModel(
+                    email = binding.etEmail.editText?.text.toString(),
+                    password =binding.etPassword.editText?.text.toString()
+                ),
+                onSuccess = ::successfulLogin,
+                onError = ::failedLogin
+            )
         }
 
         binding.btnRegister.setOnClickListener {
@@ -45,5 +53,15 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun successfulLogin(tokenModel: TokenModel){
+        apiClient.sessionManager.loginUser(tokenModel)
+        val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun failedLogin(error: String){
+        showSnackBar(error)
     }
 }

@@ -18,6 +18,8 @@ import hu.bme.aut.android.sharedshoppinglist.adapter.ShoppingListAdapter
 import hu.bme.aut.android.sharedshoppinglist.database.ShoppingListDao
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
+import hu.bme.aut.android.sharedshoppinglist.network.SessionManager
+import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.*
 import kotlinx.coroutines.*
 import java.time.LocalDateTime
@@ -25,11 +27,12 @@ import kotlin.random.Random
 
 // TODO lista nevének hosszát ellenőrizni
 class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCardListener,
-    ShoppingListAdapter.OnInsertListener, CoroutineScope by MainScope() {
+    CoroutineScope by MainScope() {
     private var _binding: FragmentShoppingListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ShoppingListAdapter
     private lateinit var database: ShoppingListDao
+    private lateinit var apiClient: ShoppingListClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +41,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
     ): View {
         _binding = FragmentShoppingListBinding.inflate(inflater, container, false)
         database = ShoppingListApplication.shoppingListDatabase.shoppingListDao()
+        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 
@@ -48,23 +52,35 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
         adapter = ShoppingListAdapter()
         binding.rvShoppingLists.layoutManager = LinearLayoutManager(activity)
         binding.rvShoppingLists.adapter = adapter
-        adapter.setShoppingLists(getShoppingList())
         adapter.itemCardListener = this
-        adapter.onInsertListener = this
+        loadShoppingLists()
 
+        binding.rlShoppingLists.setOnRefreshListener { loadShoppingLists() }
+
+        initFab()
+    }
+
+    private fun loadShoppingLists() {
+        binding.rlShoppingLists.isRefreshing = true
+        apiClient.getShoppingLists(onSuccess = ::onListsLoaded, onError = ::onListLoadFailed)
+    }
+
+    private fun onListsLoaded(shoppingLists: List<ShoppingList>) {
+        binding.rlShoppingLists.isRefreshing = false
+        adapter.setShoppingLists(shoppingLists)
+    }
+
+    private fun onListLoadFailed(error: String) {
+        binding.rlShoppingLists.isRefreshing = false
+        showSnackBar(error)
+    }
+
+    private fun initFab() {
         binding.fabExpandable.efabIcon?.setTint(requireActivity().getColor(R.color.secondaryTextColor))
         binding.fabOptionJoin.fabOptionIcon?.setTint(requireActivity().getColor(R.color.secondaryTextColor))
         binding.fabOptionCreate.fabOptionIcon?.setTint(requireActivity().getColor(R.color.secondaryTextColor))
-
-        binding.fabOptionCreate.setOnClickListener {
-            showCreateDialog()
-            Log.i("SL_A", "FAB CREATE")
-
-        }
-        binding.fabOptionJoin.setOnClickListener {
-            showJoinDialog()
-            Log.i("SL_A", "FAB JOIN")
-        }
+        binding.fabOptionCreate.setOnClickListener { showCreateDialog() }
+        binding.fabOptionJoin.setOnClickListener { showJoinDialog() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -74,7 +90,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_logout -> {
-            requireActivity().setUserLoggedIn(false)
+            SessionManager(requireContext()).logoutUser()
             val action = ShoppingListFragmentDirections.actionShoppingListFragmentToLoginFragment()
             findNavController().navigate(action)
             true
@@ -153,7 +169,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
             val id = Random.nextLong(1000)
             adapter.addShoppingList(
                 ShoppingList(
-                    id, name!!, 0,"SC$id",
+                    id, name!!, 0, "SC$id",
                     LocalDateTime.now().minusHours(Random.nextLong(168)),
                     LocalDateTime.now().plusHours(Random.nextLong(168)),
                     Random.nextBoolean()
@@ -165,47 +181,6 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListItemCar
 
             dialogBuilder.dismiss()
         }
-    }
-
-    private fun getShoppingList(): List<ShoppingList> {
-        return listOf(
-            ShoppingList(
-                1,
-                "First",
-                1,
-                "SC001",
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now(),
-                true
-            ),
-            ShoppingList(
-                2,
-                "Second",
-                2,
-                "SC002",
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now(),
-                true
-            ),
-            ShoppingList(
-                3,
-                "Third",
-                1,
-                "SC003",
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now(),
-                false
-            ),
-            ShoppingList(
-                4,
-                "Fourth",
-                1,
-                "SC004",
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now(),
-                false
-            ),
-        )
     }
 
     override fun onItemClick(shoppingList: ShoppingList) {
