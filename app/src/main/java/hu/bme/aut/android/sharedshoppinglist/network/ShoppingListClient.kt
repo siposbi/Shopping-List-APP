@@ -6,7 +6,9 @@ import android.os.Looper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
-import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListAPI.Companion.BASE_URL
+import hu.bme.aut.android.sharedshoppinglist.network.apis.AuthAPI
+import hu.bme.aut.android.sharedshoppinglist.network.apis.ProductAPI
+import hu.bme.aut.android.sharedshoppinglist.network.apis.ShoppingListAPI
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -14,7 +16,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import kotlin.concurrent.thread
 
 class ShoppingListClient(context: Context) {
-    private val apiService: ShoppingListAPI
+    companion object {
+        const val BASE_URL = "https://shoppinglistapipz1pqy.azurewebsites.net/api/"
+    }
+
+    private val authApi: AuthAPI
+    private val shoppingListApi: ShoppingListAPI
+//    private val productApi: ProductAPI
     var sessionManager: SessionManager = SessionManager(context)
 
     init {
@@ -28,7 +36,9 @@ class ShoppingListClient(context: Context) {
             .client(OkHttpClient.Builder().addInterceptor(AuthInterceptor(sessionManager)).build())
             .build()
 
-        apiService = retrofit.create(ShoppingListAPI::class.java)
+        authApi = retrofit.create(AuthAPI::class.java)
+        shoppingListApi = retrofit.create(ShoppingListAPI::class.java)
+//        productApi = retrofit.create(ProductAPI::class.java)
     }
 
     private fun <T> runCallOnBackgroundThread(
@@ -57,7 +67,7 @@ class ShoppingListClient(context: Context) {
         onSuccess: (TokenModel) -> Unit,
         onError: (String) -> Unit
     ) {
-        val loginRequest = apiService.login(loginModel)
+        val loginRequest = authApi.login(loginModel)
         runCallOnBackgroundThread(loginRequest, onSuccess, onError)
     }
 
@@ -66,7 +76,7 @@ class ShoppingListClient(context: Context) {
         onSuccess: (Long) -> Unit,
         onError: (String) -> Unit
     ) {
-        val registerRequest = apiService.register(registerModel)
+        val registerRequest = authApi.register(registerModel)
         runCallOnBackgroundThread(registerRequest, onSuccess, onError)
     }
 
@@ -74,7 +84,7 @@ class ShoppingListClient(context: Context) {
         onSuccess: (List<ShoppingList>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val getShoppingListsRequest = apiService.getShoppingLists()
+        val getShoppingListsRequest = shoppingListApi.getShoppingLists()
         runCallOnBackgroundThread(getShoppingListsRequest, onSuccess, onError)
     }
 }

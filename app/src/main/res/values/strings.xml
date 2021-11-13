@@ -42,7 +42,7 @@
     <string name="shopping_list_name_edit_text">Shopping list name</string>
     <string name="alert_dialog_create">Create</string>
     <string name="helper_text_required">*Required</string>
-    <string name="alert_dialog_rename_shopping_list_title">Renaming %1$s</string>
+    <string name="alert_dialog_rename_title">Renaming %1$s</string>
     <string name="alert_dialog_rename">Rename</string>
     <string name="item_user_first_last_name">%1$s %2$s</string>
     <string name="item_user_is_owner">Owner</string>

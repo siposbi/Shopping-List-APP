@@ -3,18 +3,15 @@ package hu.bme.aut.android.sharedshoppinglist.fragment
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.adapter.ProductAdapter
+import hu.bme.aut.android.sharedshoppinglist.databinding.DialogNewProductBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentProductListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ProductMinimal
 import hu.bme.aut.android.sharedshoppinglist.util.*
@@ -169,7 +166,7 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
 
     // TODO Actually delete, if error, return false
     override fun onItemDelete(product: ProductMinimal, position: Int): Boolean {
-        binding.root.showSnackBar(
+        showSnackBar(
             title = R.string.shopping_list_deleted,
             anchor = binding.favAddProduct,
             actionText = R.string.action_undo,
@@ -193,78 +190,61 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
     }
 
     override fun showSnackBarFromAdapter(resourceString: Int) {
-        binding.root.showSnackBar(resourceString)
+        showSnackBar(resourceString)
     }
 
     private fun showNewProductDialog() {
-        val dialogBuilder = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.alert_dialog_add_product))
-            .setView(R.layout.dialog_new_product)
+        val dialogBinding = DialogNewProductBinding.inflate(layoutInflater)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.alert_dialog_add_product)
+            .setView(dialogBinding.root)
             .setPositiveButton(getString(R.string.alertdialog_add)) { _, _ -> }
             .setNegativeButton(getString(R.string.alert_dialog_cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             .create()
+            .setPositiveButtonOnShow { dialog ->
+                val etProductName = dialogBinding.etProductName
+                if (!etProductName.requiredAndLengthValid(requireContext(), 30))
+                    return@setPositiveButtonOnShow
+                val etProductPrice = dialogBinding.etProductPrice
+                if (!etProductPrice.requiredValid(requireContext()))
+                    return@setPositiveButtonOnShow
 
-        dialogBuilder.show()
+                val smSharedItem = dialogBinding.smSharedItem
 
-        dialogBuilder.setPositiveButtonWithValidation {
-            val etProductName =
-                (dialogBuilder as? AlertDialog)?.findViewById<TextInputLayout>(R.id.etProductName)
-            etProductName?.editText?.doAfterTextChanged {
-                etProductName.clearErrorIfRequiredValid(requireActivity())
-                etProductName.clearErrorIfLengthValid(requireContext(), 30)
-            }
-            if (!etProductName!!.checkAndShowIfRequiredFilled(requireActivity())) {
-                return@setPositiveButtonWithValidation
-            }
-            if (!etProductName.checkAndShowIfLengthValid(requireActivity(), 30)) {
-                return@setPositiveButtonWithValidation
-            }
+                val name = etProductName.text
+                val price = etProductPrice.text
+                val isShared = !smSharedItem.isSelected
 
-            val etProductPrice =
-                (dialogBuilder as? AlertDialog)?.findViewById<TextInputLayout>(R.id.etProductPrice)
-            etProductPrice?.editText?.doAfterTextChanged {
-                etProductPrice.clearErrorIfRequiredValid(requireActivity())
-            }
-            if (!etProductPrice!!.checkAndShowIfRequiredFilled(requireActivity())) {
-                return@setPositiveButtonWithValidation
-            }
-
-            val smSharedItem =
-                (dialogBuilder as? AlertDialog)?.findViewById<SwitchMaterial>(R.id.smSharedItem)
-
-            val name = etProductName.editText?.text.toString()
-            val price = etProductPrice.editText?.text.toString()
-            val isShared = !smSharedItem?.isSelected!!
+                // TODO set valid range for price
 
 
-            val separatorPosition = price.indexOf('.')
+                val separatorPosition = price.indexOf('.')
 
-            // todo check if price contains dot or not
-            val priceAsLong = (price.substring(0, separatorPosition) + price.substring(
-                separatorPosition + 1,
-                separatorPosition + 3
-            )).toLong()
+                // todo check if price contains dot or not
+                val priceAsLong = (price.substring(0, separatorPosition) + price.substring(
+                    separatorPosition + 1,
+                    separatorPosition + 3
+                )).toLong()
 
-            // TODO Save with database, change data
-            val product = ProductMinimal(
-                Random.nextLong(1000),
-                "Name ${Random.nextLong(1000)}",
-                "Name ${Random.nextLong(1000)}",
-                "Name ${Random.nextLong(1000)}",
-                Random.nextLong(1000),
-                Random.nextBoolean(),
-                Random.nextBoolean()
-            )
+                // TODO Save with database, change data
+                val product = ProductMinimal(
+                    Random.nextLong(1000),
+                    "Name ${Random.nextLong(1000)}",
+                    "Name ${Random.nextLong(1000)}",
+                    "Name ${Random.nextLong(1000)}",
+                    Random.nextLong(1000),
+                    Random.nextBoolean(),
+                    Random.nextBoolean()
+                )
 
-            adapter.addProduct(product)
+                adapter.addProduct(product)
 
 
-            Log.i("SL_A", "created product: $name")
+                Log.i("SL_A", "created product: $name")
 
-            dialogBuilder.dismiss()
-        }
-
+                dialog.dismiss()
+            }.show()
     }
 }

@@ -11,11 +11,9 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentRegisterBinding
-import hu.bme.aut.android.sharedshoppinglist.network.LoginModel
 import hu.bme.aut.android.sharedshoppinglist.network.RegisterModel
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
-import hu.bme.aut.android.sharedshoppinglist.util.checkAndShowIfRequiredFilled
-import hu.bme.aut.android.sharedshoppinglist.util.clearErrorIfRequiredValid
+import hu.bme.aut.android.sharedshoppinglist.util.requiredValid
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 
 class RegisterFragment : Fragment() {
@@ -50,10 +48,10 @@ class RegisterFragment : Fragment() {
         binding.etPassword.editText?.setText(args.password)
 
         binding.btnRegister.setOnClickListener {
-            if (!binding.etFirstName.checkAndShowIfRequiredFilled(requireActivity()) or
-                !binding.etLastName.checkAndShowIfRequiredFilled(requireActivity()) or
-                !binding.etEmail.checkAndShowIfRequiredFilled(requireActivity()) or
-                !binding.etPassword.checkAndShowIfRequiredFilled(requireActivity())
+            if (!binding.etFirstName.requiredValid(requireActivity()) or
+                !binding.etLastName.requiredValid(requireActivity()) or
+                !binding.etEmail.requiredValid(requireActivity()) or
+                !binding.etPassword.requiredValid(requireActivity())
             ) {
                 return@setOnClickListener
             }
@@ -73,15 +71,6 @@ class RegisterFragment : Fragment() {
             if (binding.etPassword.error != null && checkIfPasswordIsValidAndShow(binding.etPassword)) {
                 binding.etPassword.error = null
             }
-        }
-        binding.etFirstName.editText?.doAfterTextChanged {
-            binding.etFirstName.clearErrorIfRequiredValid(requireActivity())
-        }
-        binding.etLastName.editText?.doAfterTextChanged {
-            binding.etLastName.clearErrorIfRequiredValid(requireActivity())
-        }
-        binding.etEmail.editText?.doAfterTextChanged {
-            binding.etEmail.clearErrorIfRequiredValid(requireActivity())
         }
     }
 

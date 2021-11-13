@@ -71,6 +71,7 @@ class ProductAdapter(private val context: Context) :
         products = tmpList
         submitList(products)
         if (position == 0) {
+
             onInsertListener.scrollToTop()
         }
     }
