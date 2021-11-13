@@ -23,4 +23,7 @@ interface ShoppingListAPI {
 
     @GET("$SHOPPING_LIST/getAllForUser")
     fun getShoppingLists(): Call<ResponseModel<List<ShoppingList>>>
+
+    @GET
+    fun vmi()
 }
