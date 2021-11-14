@@ -48,11 +48,12 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
         setHasOptionsMenu(true)
 
         adapter = ShoppingListAdapter(this)
-        binding.rvShoppingLists.layoutManager = LinearLayoutManager(activity)
-        binding.rvShoppingLists.adapter = adapter
+        binding.recyclerView.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.recyclerView.adapter = adapter
 
         loadShoppingLists()
-        binding.rlShoppingLists.setOnRefreshListener { reloadShoppingLists() }
+        binding.recyclerView.refreshLayout.setOnRefreshListener { reloadShoppingLists() }
+        binding.recyclerView.setOnRetryClickListener { loadShoppingLists() }
 
         initFab()
     }
@@ -80,12 +81,12 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     }
 
     private fun loadShoppingLists() {
+        binding.recyclerView.showLoadingView()
         apiClient.getShoppingLists(onSuccess = ::onListsLoaded, onError = ::onListLoadFailed)
     }
 
     private fun reloadShoppingLists() {
-        binding.rlShoppingLists.isRefreshing = true
-        loadShoppingLists()
+        apiClient.getShoppingLists(onSuccess = ::onListsLoaded, onError = ::onListReloadFailed)
     }
 
     private fun showFabPrompt() {
@@ -98,16 +99,16 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     }
 
     private fun onListsLoaded(shoppingLists: List<ShoppingList>) {
-        if (shoppingLists.isEmpty())
-            showFabPrompt()
-        binding.rlShoppingLists.isRefreshing = false
-        binding.loadingIndicator.visibility = View.GONE
         adapter.setShoppingLists(shoppingLists)
     }
 
     private fun onListLoadFailed(error: String) {
-        binding.rlShoppingLists.isRefreshing = false
-        binding.loadingIndicator.visibility = View.GONE
+        binding.recyclerView.showErrorView()
+        showSnackBar(error, anchor = binding.fabExpandable)
+    }
+
+    private fun onListReloadFailed(error: String) {
+        binding.recyclerView.hideAllViews()
         showSnackBar(error, anchor = binding.fabExpandable)
     }
 
@@ -270,6 +271,16 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     }
 
     override fun scrollToTop() {
-        binding.rvShoppingLists.smoothScrollToPosition(0)
+        binding.recyclerView.recyclerView.smoothScrollToPosition(0)
+    }
+
+    override fun itemCountCallback(count: Int) {
+        when (count) {
+            0 -> {
+                binding.recyclerView.showEmptyView()
+                showFabPrompt()
+            }
+            else -> binding.recyclerView.hideAllViews()
+        }
     }
 }

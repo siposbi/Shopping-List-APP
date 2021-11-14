@@ -68,4 +68,7 @@
     <string name="max_length">Value too long</string>
     <string name="fab_prompt_no_lists_primary">You don\'t have any lists</string>
     <string name="fab_prompt_no_lists_secondary">Create or join a shopping list</string>
+    <string name="recycler_view_nothing_here">Nothing here!</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Something went wrong!</string>
 </resources>

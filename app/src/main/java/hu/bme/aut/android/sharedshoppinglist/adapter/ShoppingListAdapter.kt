@@ -63,16 +63,19 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
     fun setShoppingLists(shoppingLists: List<ShoppingList>) {
         shoppingListList = shoppingLists
         submitList(shoppingListList)
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
     fun deleteShoppingList(shoppingListId: Long) {
         val index = shoppingListList.indexOfFirst { sl -> sl.id == shoppingListId }
         shoppingListList = submitRemoveAt(shoppingListList, index)
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
     fun updateShoppingList(shoppingList: ShoppingList) {
         val index = shoppingListList.indexOfFirst { sl -> sl.id == shoppingList.id }
         shoppingListList = submitUpdateAt(shoppingListList, shoppingList, index)
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
     fun addShoppingList(shoppingList: ShoppingList, position: Int = 0) {
@@ -80,6 +83,7 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
         if (position == 0) {
             shoppingListCardListener.scrollToTop()
         }
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
     interface ShoppingListCardListener {
@@ -88,6 +92,7 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
         fun onShareClick(shoppingList: ShoppingList)
         fun onDeleteClick(shoppingList: ShoppingList, position: Int)
         fun scrollToTop()
+        fun itemCountCallback(count: Int)
     }
 
     companion object {

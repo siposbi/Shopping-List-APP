@@ -12,7 +12,10 @@ import hu.bme.aut.android.sharedshoppinglist.model.Member
 import hu.bme.aut.android.sharedshoppinglist.util.asDateString
 
 
-class MemberAdapter(private val context: Context) :
+class MemberAdapter(
+    private val memberListListener: MemberListListener,
+    private val context: Context
+) :
     ListAdapter<Member, MemberAdapter.ViewHolder>(itemCallback) {
 
     private var members = emptyList<Member>()
@@ -41,6 +44,11 @@ class MemberAdapter(private val context: Context) :
     fun setMembers(membersIn: List<Member>) {
         members = membersIn
         submitList(members)
+        memberListListener.itemCountCallback(members.count())
+    }
+
+    interface MemberListListener {
+        fun itemCountCallback(count: Int)
     }
 
     companion object {

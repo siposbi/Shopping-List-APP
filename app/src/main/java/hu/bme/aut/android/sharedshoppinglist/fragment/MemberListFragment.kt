@@ -14,7 +14,7 @@ import hu.bme.aut.android.sharedshoppinglist.model.Member
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 
-class MemberListFragment : Fragment() {
+class MemberListFragment : Fragment(), MemberAdapter.MemberListListener {
     private var _binding: FragmentMemberListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: MemberAdapter
@@ -34,10 +34,12 @@ class MemberListFragment : Fragment() {
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 
-        adapter = MemberAdapter(requireContext())
-        binding.rvMembersList.layoutManager = LinearLayoutManager(activity)
-        binding.rvMembersList.adapter = adapter
+        adapter = MemberAdapter(this, requireContext())
+        binding.recyclerView.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.recyclerView.adapter = adapter
+
         loadMembers()
+        binding.recyclerView.setOnRetryClickListener { loadMembers() }
     }
 
     override fun onDestroyView() {
@@ -46,6 +48,7 @@ class MemberListFragment : Fragment() {
     }
 
     private fun loadMembers() {
+        binding.recyclerView.showLoadingView()
         apiClient.getMembers(
             listId = args.shoppingListId,
             onSuccess = ::onMembersLoaded,
@@ -54,12 +57,18 @@ class MemberListFragment : Fragment() {
     }
 
     private fun onMembersLoaded(members: List<Member>) {
-        binding.loadingIndicator.visibility = View.GONE
         adapter.setMembers(members)
     }
 
     private fun onMembersLoadFailed(error: String) {
-        binding.loadingIndicator.visibility = View.GONE
+        binding.recyclerView.showErrorView()
         showSnackBar(error, length = Snackbar.LENGTH_LONG)
+    }
+
+    override fun itemCountCallback(count: Int) {
+        when (count) {
+            0 -> binding.recyclerView.showEmptyView()
+            else -> binding.recyclerView.hideAllViews()
+        }
     }
 }
