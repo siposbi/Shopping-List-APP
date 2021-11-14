@@ -34,7 +34,7 @@ fun TextInputLayout.requiredAndLengthValid(context: Context, maximum: Int): Bool
 }
 
 private fun TextInputLayout.checkAndShowIfLengthValid(context: Context, maximum: Int): Boolean {
-    if (this.editText!!.text.toString().length <= maximum) {
+    if (this.text.length <= maximum) {
         return true
     }
     this.error = context.getString(R.string.max_length)
@@ -42,7 +42,7 @@ private fun TextInputLayout.checkAndShowIfLengthValid(context: Context, maximum:
 }
 
 private fun TextInputLayout.checkAndShowIfRequiredFilled(context: Context): Boolean {
-    if (this.editText!!.text.toString().isNotEmpty()) {
+    if (this.text.isNotEmpty()) {
         return true
     }
     this.error = context.getString(R.string.required_error)

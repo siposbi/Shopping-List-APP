@@ -52,7 +52,7 @@ class RegisterFragment : Fragment() {
             if (!binding.etFirstName.requiredValid(requireActivity()) or
                 !binding.etLastName.requiredValid(requireActivity()) or
                 !binding.etEmail.requiredValid(requireActivity()) or
-                !binding.etPassword.requiredValid(requireActivity())
+                !binding.etPassword.passwordValid()
             ) {
                 return@setOnClickListener
             }
@@ -67,19 +67,21 @@ class RegisterFragment : Fragment() {
                 onError = ::failedRegistration
             )
         }
-
-        binding.etPassword.editText?.doAfterTextChanged {
-            if (binding.etPassword.error != null && checkIfPasswordIsValidAndShow(binding.etPassword)) {
-                binding.etPassword.error = null
-            }
-        }
     }
 
-    private fun checkIfPasswordIsValidAndShow(textInput: TextInputLayout): Boolean {
-        if (binding.etPassword.editText!!.text.toString().length >= 8) {
+    private fun TextInputLayout.passwordValid(): Boolean {
+        editText?.doAfterTextChanged {
+            if (checkAndShowIfPasswordValid())
+                error = null
+        }
+        return checkAndShowIfPasswordValid()
+    }
+
+    private fun TextInputLayout.checkAndShowIfPasswordValid(): Boolean {
+        if (this.text.length >= 8) {
             return true
         }
-        textInput.error = getString(R.string.password_error)
+        error = getString(R.string.password_error)
         return false
     }
 

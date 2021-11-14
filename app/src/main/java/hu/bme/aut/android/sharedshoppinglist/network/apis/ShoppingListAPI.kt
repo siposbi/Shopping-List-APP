@@ -9,6 +9,8 @@ import hu.bme.aut.android.sharedshoppinglist.network.ResponseModel
 import hu.bme.aut.android.sharedshoppinglist.network.TokenModel
 import retrofit2.Call
 import retrofit2.http.*
+import java.time.LocalDateTime
+import java.util.*
 
 interface ShoppingListAPI {
     companion object {
@@ -28,11 +30,18 @@ interface ShoppingListAPI {
     fun leave(@Path("listId") listId: Long): Call<ResponseModel<Long>>
 
     @PUT("${SHOPPING_LIST}/rename/{listId}")
-    fun rename(@Path("listId") listId: Long, @Body newName: String): Call<ResponseModel<ShoppingList>>
+    fun rename(
+        @Path("listId") listId: Long,
+        @Body newName: String
+    ): Call<ResponseModel<ShoppingList>>
 
     @GET("${SHOPPING_LIST}/getMembers/{listId}")
     fun getMembers(@Path("listId") listId: Long): Call<ResponseModel<List<Member>>>
 
     @GET("${SHOPPING_LIST}/getExport/{listId}")
-    fun getExport(@Path("listId") listId: Long): Call<ResponseModel<List<Export>>>
+    fun getExport(
+        @Path("listId") listId: Long,
+        @Query("startDate") startDate: LocalDateTime,
+        @Query("endDatetime") endDate: LocalDateTime
+    ): Call<ResponseModel<List<Export>>>
 }

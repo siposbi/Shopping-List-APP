@@ -14,11 +14,11 @@ import hu.bme.aut.android.sharedshoppinglist.model.Member
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 
-class MemberListFragment : Fragment(), MemberAdapter.MemberListListener {
+class MemberFragment : Fragment(), MemberAdapter.MemberAdapterListener {
     private var _binding: FragmentMemberListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: MemberAdapter
-    private val args: MemberListFragmentArgs by navArgs()
+    private val args: MemberFragmentArgs by navArgs()
     private lateinit var apiClient: ShoppingListClient
 
     override fun onCreateView(

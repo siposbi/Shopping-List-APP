@@ -71,4 +71,8 @@
     <string name="recycler_view_nothing_here">Nothing here!</string>
     <string name="retry">Retry</string>
     <string name="something_went_wrong">Something went wrong!</string>
+    <string name="choose_date_prompt">Choose date</string>
+    <string name="no_date_selected_banner">Please choose a date to show shopping list export</string>
+    <string name="no_date_selected">No date selected</string>
+    <string name="date_format">%1$d.%2$d.%3$d.</string>
 </resources>

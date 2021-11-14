@@ -15,6 +15,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.time.LocalDateTime
+import java.util.*
 import kotlin.concurrent.thread
 
 class ShoppingListClient(context: Context) {
@@ -138,10 +140,12 @@ class ShoppingListClient(context: Context) {
 
     fun getExport(
         listId: Long,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime,
         onSuccess: (List<Export>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val getExportRequest = shoppingListApi.getExport(listId)
+        val getExportRequest = shoppingListApi.getExport(listId, startDate, endDate)
         runCallOnBackgroundThread(getExportRequest, onSuccess, onError)
     }
 }

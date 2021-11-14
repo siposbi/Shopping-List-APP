@@ -13,7 +13,7 @@ import hu.bme.aut.android.sharedshoppinglist.util.asDateString
 
 
 class MemberAdapter(
-    private val memberListListener: MemberListListener,
+    private val memberAdapterListener: MemberAdapterListener,
     private val context: Context
 ) :
     ListAdapter<Member, MemberAdapter.ViewHolder>(itemCallback) {
@@ -44,10 +44,10 @@ class MemberAdapter(
     fun setMembers(membersIn: List<Member>) {
         members = membersIn
         submitList(members)
-        memberListListener.itemCountCallback(members.count())
+        memberAdapterListener.itemCountCallback(members.count())
     }
 
-    interface MemberListListener {
+    interface MemberAdapterListener {
         fun itemCountCallback(count: Int)
     }
 

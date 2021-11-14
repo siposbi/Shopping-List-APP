@@ -59,7 +59,7 @@
         android:id="@+id/exportFragment"
         android:name="hu.bme.aut.android.sharedshoppinglist.fragment.ExportFragment"
         android:label="Export: {shoppingListName}"
-        tools:layout="@layout/fragment_export">
+        tools:layout="@layout/fragment_export_list">
         <argument
             android:name="shoppingListName"
             app:argType="string" />
@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/memberListFragment"
-        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.MemberListFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.MemberFragment"
         android:label="Members: {shoppingListName}"
         tools:layout="@layout/fragment_member_list">
         <argument
