@@ -1,13 +1,12 @@
 package hu.bme.aut.android.sharedshoppinglist.network
 
-import android.content.Context
-import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
-import okhttp3.*
+import okhttp3.Interceptor
+import okhttp3.Response
 
 /**
  * Interceptor to add auth token to requests
  */
-class AuthInterceptor(val sessionManager: SessionManager) : Interceptor {
+class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val requestBuilder = chain.request().newBuilder()
 

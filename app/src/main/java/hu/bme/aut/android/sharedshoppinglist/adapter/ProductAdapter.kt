@@ -46,7 +46,10 @@ class ProductAdapter(private val context: Context) :
             context.getString(R.string.for_everyone)
         } else {
             //TODO USE ACTUAL NAME
-            context.getString(R.string.for_selected_member, "${product.addedByUserFirstName}${product.addedByUserLastName}")
+            context.getString(
+                R.string.for_selected_member,
+                "${product.addedByUserFirstName}${product.addedByUserLastName}"
+            )
         }
     }
 
@@ -84,7 +87,7 @@ class ProductAdapter(private val context: Context) :
 //        } else if (productListener!!.onItemDelete(product, adapterPosition)) {
 //            products = submitRemoveAt(products, adapterPosition)
 //        }
-        if (productListener!!.onItemDelete(product, adapterPosition)){
+        if (productListener!!.onItemDelete(product, adapterPosition)) {
             products = submitRemoveAt(products, adapterPosition)
         }
     }
@@ -139,11 +142,17 @@ class ProductAdapter(private val context: Context) :
 
     companion object {
         object itemCallback : DiffUtil.ItemCallback<ProductMinimal>() {
-            override fun areItemsTheSame(oldItem: ProductMinimal, newItem: ProductMinimal): Boolean {
+            override fun areItemsTheSame(
+                oldItem: ProductMinimal,
+                newItem: ProductMinimal
+            ): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: ProductMinimal, newItem: ProductMinimal): Boolean {
+            override fun areContentsTheSame(
+                oldItem: ProductMinimal,
+                newItem: ProductMinimal
+            ): Boolean {
                 return oldItem == newItem
             }
         }

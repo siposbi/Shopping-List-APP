@@ -26,21 +26,24 @@ class MainActivity : AppCompatActivity() {
         val isUserLoggedIn = SessionManager(this).getUserLoggedIn()
 
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val inflater = navHostFragment.navController.navInflater
         val graph = inflater.inflate(R.navigation.nav_graph)
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
             graph.startDestination = R.id.shoppingListFragment
         } else {
             graph.startDestination = R.id.loginFragment
         }
         navHostFragment.navController.graph = graph
-        supportFragmentManager.beginTransaction().setPrimaryNavigationFragment(navHostFragment).commit()
+        supportFragmentManager.beginTransaction().setPrimaryNavigationFragment(navHostFragment)
+            .commit()
         navController = navHostFragment.navController
 
         setSupportActionBar(binding.toolbar)
 
-        val appBarConfiguration = AppBarConfiguration.Builder(R.id.loginFragment, R.id.shoppingListFragment).build()
+        val appBarConfiguration =
+            AppBarConfiguration.Builder(R.id.loginFragment, R.id.shoppingListFragment).build()
 
         setupActionBarWithNavController(navController, appBarConfiguration)
     }

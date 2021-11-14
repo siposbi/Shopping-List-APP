@@ -16,7 +16,6 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.time.LocalDateTime
-import java.util.*
 import kotlin.concurrent.thread
 
 class ShoppingListClient(context: Context) {

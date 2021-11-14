@@ -35,7 +35,7 @@ class LoginFragment : Fragment() {
             apiClient.login(
                 loginModel = LoginModel(
                     email = binding.etEmail.text,
-                    password =binding.etPassword.text
+                    password = binding.etPassword.text
                 ),
                 onSuccess = ::successfulLogin,
                 onError = ::failedLogin
@@ -56,13 +56,13 @@ class LoginFragment : Fragment() {
         _binding = null
     }
 
-    private fun successfulLogin(tokenModel: TokenModel){
+    private fun successfulLogin(tokenModel: TokenModel) {
         apiClient.sessionManager.loginUser(tokenModel)
         val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
         findNavController().navigate(action)
     }
 
-    private fun failedLogin(error: String){
+    private fun failedLogin(error: String) {
         showSnackBar(error)
     }
 }
