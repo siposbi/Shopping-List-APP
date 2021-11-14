@@ -66,4 +66,6 @@
     <string name="alertdialog_add">Add</string>
     <string name="action_save_export">Save as JSON</string>
     <string name="max_length">Value too long</string>
+    <string name="fab_prompt_no_lists_primary">You don\'t have any lists</string>
+    <string name="fab_prompt_no_lists_secondary">Create or join a shopping list</string>
 </resources>

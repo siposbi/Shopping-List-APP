@@ -63,10 +63,6 @@ class ExportFragment : Fragment() {
             showDatePicker()
             true
         }
-        R.id.action_save_export -> {
-            // TODO SAVE FILE (persze csak ha van mint menteni amúgy)
-            true
-        }
         else -> {
             super.onOptionsItemSelected(item)
         }

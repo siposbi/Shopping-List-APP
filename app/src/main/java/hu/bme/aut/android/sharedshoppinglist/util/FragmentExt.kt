@@ -2,6 +2,7 @@ package hu.bme.aut.android.sharedshoppinglist.util
 
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
 fun Fragment.showSnackBar(
@@ -24,8 +25,11 @@ fun Fragment.showSnackBar(
     action: (() -> Unit)? = null,
     anchor: View? = null
 ) {
-    val snackBar = Snackbar.make(view!!, title, length)
-    if (anchor != null) snackBar.anchorView = anchor
-    if (actionText != null && action != null) snackBar.setAction(actionText) { action() }
-    snackBar.show()
+    showSnackBar(
+        title = context!!.getString(title),
+        length = length,
+        actionText = actionText?.let { context!!.getString(it) },
+        action = action,
+        anchor = anchor
+    )
 }

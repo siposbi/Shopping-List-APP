@@ -15,6 +15,7 @@ import hu.bme.aut.android.sharedshoppinglist.network.RegisterModel
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.requiredValid
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
+import hu.bme.aut.android.sharedshoppinglist.util.text
 
 class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
@@ -44,8 +45,8 @@ class RegisterFragment : Fragment() {
     }
 
     private fun initForm() {
-        binding.etEmail.editText?.setText(args.email)
-        binding.etPassword.editText?.setText(args.password)
+        args.email?.let { binding.etEmail.text = it }
+        args.password?.let { binding.etPassword.text = it }
 
         binding.btnRegister.setOnClickListener {
             if (!binding.etFirstName.requiredValid(requireActivity()) or
@@ -57,10 +58,10 @@ class RegisterFragment : Fragment() {
             }
             apiClient.register(
                 registerModel = RegisterModel(
-                    firstName = binding.etFirstName.editText?.text.toString(),
-                    lastName = binding.etLastName.editText?.text.toString(),
-                    email = binding.etEmail.editText?.text.toString(),
-                    password =binding.etPassword.editText?.text.toString()
+                    firstName = binding.etFirstName.text,
+                    lastName = binding.etLastName.text,
+                    email = binding.etEmail.text,
+                    password = binding.etPassword.text
                 ),
                 onSuccess = ::successfulRegistration,
                 onError = ::failedRegistration

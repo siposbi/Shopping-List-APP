@@ -49,9 +49,8 @@ private fun TextInputLayout.checkAndShowIfRequiredFilled(context: Context): Bool
     return false
 }
 
-fun TextInputLayout.setText(text: String) {
-    editText?.setText(text)
-}
-
-val TextInputLayout.text: String
+var TextInputLayout.text: String
     get() = editText?.text?.toString() ?: ""
+    set(value) {
+        editText?.setText(value)
+    }

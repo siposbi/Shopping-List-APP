@@ -5,6 +5,8 @@ import android.os.Handler
 import android.os.Looper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import hu.bme.aut.android.sharedshoppinglist.model.Export
+import hu.bme.aut.android.sharedshoppinglist.model.Member
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
 import hu.bme.aut.android.sharedshoppinglist.network.apis.AuthAPI
 import hu.bme.aut.android.sharedshoppinglist.network.apis.ProductAPI
@@ -22,7 +24,7 @@ class ShoppingListClient(context: Context) {
 
     private val authApi: AuthAPI
     private val shoppingListApi: ShoppingListAPI
-//    private val productApi: ProductAPI
+    private val productApi: ProductAPI
     var sessionManager: SessionManager = SessionManager(context)
 
     init {
@@ -38,7 +40,7 @@ class ShoppingListClient(context: Context) {
 
         authApi = retrofit.create(AuthAPI::class.java)
         shoppingListApi = retrofit.create(ShoppingListAPI::class.java)
-//        productApi = retrofit.create(ProductAPI::class.java)
+        productApi = retrofit.create(ProductAPI::class.java)
     }
 
     private fun <T> runCallOnBackgroundThread(
@@ -86,5 +88,60 @@ class ShoppingListClient(context: Context) {
     ) {
         val getShoppingListsRequest = shoppingListApi.getShoppingLists()
         runCallOnBackgroundThread(getShoppingListsRequest, onSuccess, onError)
+    }
+
+    fun join(
+        shareCode: String,
+        onSuccess: (ShoppingList) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val joinListRequest = shoppingListApi.join(shareCode)
+        runCallOnBackgroundThread(joinListRequest, onSuccess, onError)
+    }
+
+    fun leave(
+        listId: Long,
+        onSuccess: (Long) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val leaveListRequest = shoppingListApi.leave(listId)
+        runCallOnBackgroundThread(leaveListRequest, onSuccess, onError)
+    }
+
+    fun rename(
+        listId: Long,
+        newName: String,
+        onSuccess: (ShoppingList) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val renameListRequest = shoppingListApi.rename(listId, newName)
+        runCallOnBackgroundThread(renameListRequest, onSuccess, onError)
+    }
+
+    fun create(
+        name: String,
+        onSuccess: (ShoppingList) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val createListRequest = shoppingListApi.create(name)
+        runCallOnBackgroundThread(createListRequest, onSuccess, onError)
+    }
+
+    fun getMembers(
+        listId: Long,
+        onSuccess: (List<Member>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val getMembersRequest = shoppingListApi.getMembers(listId)
+        runCallOnBackgroundThread(getMembersRequest, onSuccess, onError)
+    }
+
+    fun getExport(
+        listId: Long,
+        onSuccess: (List<Export>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val getExportRequest = shoppingListApi.getExport(listId)
+        runCallOnBackgroundThread(getExportRequest, onSuccess, onError)
     }
 }

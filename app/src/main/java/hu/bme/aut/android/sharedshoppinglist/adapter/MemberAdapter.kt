@@ -10,13 +10,17 @@ import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.databinding.ItemMemberBinding
 import hu.bme.aut.android.sharedshoppinglist.model.Member
 import hu.bme.aut.android.sharedshoppinglist.util.asDateString
-import java.time.format.DateTimeFormatter
 
 
 class MemberAdapter(private val context: Context) :
     ListAdapter<Member, MemberAdapter.ViewHolder>(itemCallback) {
 
     private var members = emptyList<Member>()
+
+    inner class ViewHolder(val binding: ItemMemberBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var member: Member? = null
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(ItemMemberBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -30,17 +34,13 @@ class MemberAdapter(private val context: Context) :
         holder.binding.tvIsOwner.text =
             if (member.isOwner) context.getString(R.string.item_user_is_owner) else ""
         val joinDateString = member.joinDateTime.asDateString
-        holder.binding.tvJoinDate.text = context.getString(R.string.item_user_join_date, joinDateString)
+        holder.binding.tvJoinDate.text =
+            context.getString(R.string.item_user_join_date, joinDateString)
     }
 
     fun setMembers(membersIn: List<Member>) {
-        members += membersIn
+        members = membersIn
         submitList(members)
-    }
-
-    inner class ViewHolder(val binding: ItemMemberBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        var member: Member? = null
     }
 
     companion object {

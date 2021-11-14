@@ -2,13 +2,11 @@ package hu.bme.aut.android.sharedshoppinglist.fragment
 
 import android.content.*
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ShoppingListAdapter
@@ -22,9 +20,8 @@ import hu.bme.aut.android.sharedshoppinglist.network.SessionManager
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.*
 import kotlinx.coroutines.*
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
-
-// TODO lista nevének hosszát ellenőrizni
 class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardListener,
     CoroutineScope by MainScope() {
     private var _binding: FragmentShoppingListBinding? = null
@@ -32,6 +29,8 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     private lateinit var adapter: ShoppingListAdapter
     private lateinit var database: ShoppingListDao
     private lateinit var apiClient: ShoppingListClient
+    private var lastDeletedShareCode: String? = null
+    private var lastDeletedPosition: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +52,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
         binding.rvShoppingLists.adapter = adapter
 
         loadShoppingLists()
-        binding.rlShoppingLists.setOnRefreshListener { loadShoppingLists() }
+        binding.rlShoppingLists.setOnRefreshListener { reloadShoppingLists() }
 
         initFab()
     }
@@ -81,17 +80,34 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     }
 
     private fun loadShoppingLists() {
-        binding.rlShoppingLists.isRefreshing = true
         apiClient.getShoppingLists(onSuccess = ::onListsLoaded, onError = ::onListLoadFailed)
     }
 
+    private fun reloadShoppingLists() {
+        binding.rlShoppingLists.isRefreshing = true
+        loadShoppingLists()
+    }
+
+    private fun showFabPrompt() {
+        MaterialTapTargetPrompt.Builder(this)
+            .setTarget(binding.fabExpandable)
+            .setPrimaryText(R.string.fab_prompt_no_lists_primary)
+            .setSecondaryText(R.string.fab_prompt_no_lists_secondary)
+            .setAppColors(requireContext())
+            .show()
+    }
+
     private fun onListsLoaded(shoppingLists: List<ShoppingList>) {
+        if (shoppingLists.isEmpty())
+            showFabPrompt()
         binding.rlShoppingLists.isRefreshing = false
+        binding.loadingIndicator.visibility = View.GONE
         adapter.setShoppingLists(shoppingLists)
     }
 
     private fun onListLoadFailed(error: String) {
         binding.rlShoppingLists.isRefreshing = false
+        binding.loadingIndicator.visibility = View.GONE
         showSnackBar(error, anchor = binding.fabExpandable)
     }
 
@@ -125,11 +141,18 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
 
                 val shareCode = etJoinCode.text
 
-                // TODO Join via network
+                apiClient.join(
+                    shareCode = shareCode,
+                    onSuccess = ::onListJoined,
+                    onError = ::requestFailed
+                )
 
-                Log.i("SL_A", "INPUT SHARE CODE: $shareCode")
                 dialog.dismiss()
             }.show()
+    }
+
+    private fun onListJoined(shoppingList: ShoppingList) {
+        adapter.addShoppingList(shoppingList)
     }
 
     private fun showCreateDialog() {
@@ -142,15 +165,21 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
             .create()
             .setPositiveButtonOnShow { dialog ->
                 val etShoppingListName = dialogBinding.etShoppingListName
-                if (!etShoppingListName.lengthValid(requireContext(), 20))
+                if (!etShoppingListName.requiredAndLengthValid(requireContext(), 20))
                     return@setPositiveButtonOnShow
-                val name = etShoppingListName.text
 
-                // TODO Create via network
+                apiClient.create(
+                    name = etShoppingListName.text,
+                    onSuccess = ::onListCreated,
+                    onError = ::requestFailed
+                )
 
-                Log.i("SL_A", "INPUT LIST NAME: $name")
                 dialog.dismiss()
             }.show()
+    }
+
+    private fun onListCreated(shoppingList: ShoppingList) {
+        adapter.addShoppingList(shoppingList)
     }
 
     override fun onItemClick(shoppingList: ShoppingList) {
@@ -171,22 +200,40 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     }
 
     override fun onDeleteClick(shoppingList: ShoppingList, position: Int) {
-        // TODO Delete item, if successfull, delete from list
-        adapter.deleteShoppingList(shoppingList)
-
-        Snackbar.make(binding.root, R.string.shopping_list_deleted, Snackbar.LENGTH_SHORT)
-            .setAnchorView(binding.fabExpandable)
-            .setAction(R.string.action_undo) {
-                // TODO cancel delete via server, is successfull, continue
-                adapter.addShoppingList(shoppingList, position)
-            }.show()
-
-        Log.i("SL_A", "DELETE ${shoppingList.id}")
+        lastDeletedShareCode = shoppingList.shareCode
+        lastDeletedPosition = position
+        apiClient.leave(
+            listId = shoppingList.id,
+            onSuccess = ::onListLeft,
+            onError = ::requestFailed
+        )
     }
 
-    override fun onItemLongClick(shoppingList: ShoppingList, index: Int) {
+    private fun onListLeft(shoppingListId: Long) {
+        adapter.deleteShoppingList(shoppingListId)
+        showSnackBar(
+            title = R.string.shopping_list_deleted,
+            actionText = R.string.action_undo,
+            action = {
+                lastDeletedShareCode?.let {
+                    apiClient.join(
+                        shareCode = it,
+                        onSuccess = ::onListLeftUndo,
+                        onError = ::requestFailed
+                    )
+                }
+            },
+            anchor = binding.fabExpandable
+        )
+    }
+
+    private fun onListLeftUndo(shoppingList: ShoppingList) {
+        lastDeletedPosition?.let { adapter.addShoppingList(shoppingList, it) }
+    }
+
+    override fun onItemLongClick(shoppingList: ShoppingList) {
         val dialogBinding = DialogInputShoppingListRenameBinding.inflate(layoutInflater)
-        dialogBinding.etShoppingListRename.setText(shoppingList.name)
+        dialogBinding.etShoppingListRename.text = shoppingList.name
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.alert_dialog_rename_title, shoppingList.name))
             .setView(dialogBinding.root)
@@ -203,11 +250,23 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
                     return@setPositiveButtonOnShow
                 }
 
-                // TODO Update via internet
+                apiClient.rename(
+                    listId = shoppingList.id,
+                    newName = newName,
+                    onSuccess = ::onListRenamed,
+                    onError = ::requestFailed
+                )
 
-                adapter.updateShoppingListWithIndex(shoppingList.copy(name = newName), index)
                 dialog.dismiss()
             }.show()
+    }
+
+    private fun onListRenamed(shoppingList: ShoppingList) {
+        adapter.updateShoppingList(shoppingList)
+    }
+
+    private fun requestFailed(error: String) {
+        showSnackBar(error, anchor = binding.fabExpandable)
     }
 
     override fun scrollToTop() {

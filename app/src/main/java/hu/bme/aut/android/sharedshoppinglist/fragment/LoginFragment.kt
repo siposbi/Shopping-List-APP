@@ -11,6 +11,7 @@ import hu.bme.aut.android.sharedshoppinglist.network.LoginModel
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.network.TokenModel
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
+import hu.bme.aut.android.sharedshoppinglist.util.text
 
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
@@ -33,8 +34,8 @@ class LoginFragment : Fragment() {
         binding.btnLogin.setOnClickListener {
             apiClient.login(
                 loginModel = LoginModel(
-                    email = binding.etEmail.editText?.text.toString(),
-                    password =binding.etPassword.editText?.text.toString()
+                    email = binding.etEmail.text,
+                    password =binding.etPassword.text
                 ),
                 onSuccess = ::successfulLogin,
                 onError = ::failedLogin
@@ -43,8 +44,8 @@ class LoginFragment : Fragment() {
 
         binding.btnRegister.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToRegisterFragment(
-                email = binding.etEmail.editText?.text.toString(),
-                password = binding.etPassword.editText?.text.toString()
+                email = binding.etEmail.text,
+                password = binding.etPassword.text
             )
             findNavController().navigate(action)
         }

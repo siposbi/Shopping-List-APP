@@ -10,6 +10,7 @@ import hu.bme.aut.android.sharedshoppinglist.databinding.ItemShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
 import hu.bme.aut.android.sharedshoppinglist.util.asDateTimeString
 import hu.bme.aut.android.sharedshoppinglist.util.submitAdd
+import hu.bme.aut.android.sharedshoppinglist.util.submitRemoveAt
 import hu.bme.aut.android.sharedshoppinglist.util.submitUpdateAt
 
 class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCardListener) :
@@ -26,11 +27,7 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
                 shoppingList?.let { shoppingListCardListener.onItemClick(it) }
             }
             itemView.setOnLongClickListener {
-                shoppingList?.let {
-                    shoppingListCardListener.onItemLongClick(
-                        it.copy(), absoluteAdapterPosition
-                    )
-                }
+                shoppingList?.let { shoppingListCardListener.onItemLongClick(it) }
                 true
             }
             binding.btnShare.setOnClickListener {
@@ -68,12 +65,13 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
         submitList(shoppingListList)
     }
 
-    fun deleteShoppingList(shoppingList: ShoppingList) {
-        shoppingListList -= shoppingList
-        submitList(shoppingListList)
+    fun deleteShoppingList(shoppingListId: Long) {
+        val index = shoppingListList.indexOfFirst { sl -> sl.id == shoppingListId }
+        shoppingListList = submitRemoveAt(shoppingListList, index)
     }
 
-    fun updateShoppingListWithIndex(shoppingList: ShoppingList, index: Int) {
+    fun updateShoppingList(shoppingList: ShoppingList) {
+        val index = shoppingListList.indexOfFirst { sl -> sl.id == shoppingList.id }
         shoppingListList = submitUpdateAt(shoppingListList, shoppingList, index)
     }
 
@@ -86,7 +84,7 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
 
     interface ShoppingListCardListener {
         fun onItemClick(shoppingList: ShoppingList)
-        fun onItemLongClick(shoppingList: ShoppingList, index: Int)
+        fun onItemLongClick(shoppingList: ShoppingList)
         fun onShareClick(shoppingList: ShoppingList)
         fun onDeleteClick(shoppingList: ShoppingList, position: Int)
         fun scrollToTop()

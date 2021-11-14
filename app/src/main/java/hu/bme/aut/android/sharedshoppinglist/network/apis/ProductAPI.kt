@@ -5,7 +5,7 @@ import hu.bme.aut.android.sharedshoppinglist.network.ResponseModel
 import retrofit2.Call
 import retrofit2.http.GET
 
-class ProductAPI {
+interface ProductAPI {
     companion object{
         const val PRODUCTS = "Product"
     }
