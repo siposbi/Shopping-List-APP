@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentLoginBinding
 import hu.bme.aut.android.sharedshoppinglist.network.model.LoginModel
-import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.network.model.TokenModel
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 import hu.bme.aut.android.sharedshoppinglist.util.text
@@ -16,7 +16,7 @@ import hu.bme.aut.android.sharedshoppinglist.util.text
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var apiClient: ShoppingListClient
+    private val apiClient = ShoppingListApplication.apiClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,7 +24,6 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 

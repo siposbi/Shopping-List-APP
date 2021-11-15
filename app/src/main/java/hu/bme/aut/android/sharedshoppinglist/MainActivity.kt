@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
@@ -19,8 +18,8 @@ import hu.bme.aut.android.sharedshoppinglist.network.model.TokenModel
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var apiClient: ShoppingListClient
-    private lateinit var sessionManager: SessionManager
+    private val apiClient: ShoppingListClient = ShoppingListApplication.apiClient
+    private val sessionManager: SessionManager = ShoppingListApplication.sessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +28,6 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        apiClient = ShoppingListClient(this)
-        sessionManager = SessionManager(this)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -67,11 +63,11 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-    private fun onRefreshTokenSuccess(tokenModel: TokenModel){
+    private fun onRefreshTokenSuccess(tokenModel: TokenModel) {
         sessionManager.loginUser(tokenModel)
     }
 
-    private fun tokenRefreshFail(error: String){
+    private fun tokenRefreshFail(error: String) {
         sessionManager.logoutUser()
         Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
         val action = ShoppingListFragmentDirections.actionShoppingListFragmentToLoginFragment()

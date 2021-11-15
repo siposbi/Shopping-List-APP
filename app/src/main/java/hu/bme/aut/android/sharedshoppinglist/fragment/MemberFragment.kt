@@ -8,10 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.MemberAdapter
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentMemberListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.Member
-import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 
 class MemberFragment : Fragment(), MemberAdapter.MemberAdapterListener {
@@ -19,7 +19,7 @@ class MemberFragment : Fragment(), MemberAdapter.MemberAdapterListener {
     private val binding get() = _binding!!
     private lateinit var adapter: MemberAdapter
     private val args: MemberFragmentArgs by navArgs()
-    private lateinit var apiClient: ShoppingListClient
+    private val apiClient = ShoppingListApplication.apiClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,7 +27,6 @@ class MemberFragment : Fragment(), MemberAdapter.MemberAdapterListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMemberListBinding.inflate(inflater, container, false)
-        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 

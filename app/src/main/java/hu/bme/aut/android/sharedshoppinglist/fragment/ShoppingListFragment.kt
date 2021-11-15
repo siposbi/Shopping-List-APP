@@ -10,14 +10,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ShoppingListAdapter
-import hu.bme.aut.android.sharedshoppinglist.database.ShoppingListDao
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListCreateBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListJoinCodeBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListRenameBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
 import hu.bme.aut.android.sharedshoppinglist.network.SessionManager
-import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.*
 import kotlinx.coroutines.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
@@ -27,8 +25,8 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     private var _binding: FragmentShoppingListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ShoppingListAdapter
-    private lateinit var database: ShoppingListDao
-    private lateinit var apiClient: ShoppingListClient
+    private val apiClient = ShoppingListApplication.apiClient
+    private val database = ShoppingListApplication.shoppingListDatabase.shoppingListDao()
     private var lastDeletedShareCode: String? = null
     private var lastDeletedPosition: Int? = null
 
@@ -38,8 +36,6 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentShoppingListBinding.inflate(inflater, container, false)
-        database = ShoppingListApplication.shoppingListDatabase.shoppingListDao()
-        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 

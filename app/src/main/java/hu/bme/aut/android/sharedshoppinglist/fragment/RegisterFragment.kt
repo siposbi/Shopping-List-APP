@@ -10,9 +10,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentRegisterBinding
 import hu.bme.aut.android.sharedshoppinglist.network.model.RegisterModel
-import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.requiredValid
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 import hu.bme.aut.android.sharedshoppinglist.util.text
@@ -21,7 +21,7 @@ class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
     private val args: RegisterFragmentArgs by navArgs()
-    private lateinit var apiClient: ShoppingListClient
+    private val apiClient = ShoppingListApplication.apiClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,7 +29,6 @@ class RegisterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
-        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 
@@ -85,7 +84,7 @@ class RegisterFragment : Fragment() {
         return false
     }
 
-    private fun successfulRegistration(id: Long) {
+    private fun successfulRegistration(@Suppress("UNUSED_PARAMETER") id: Long) {
         showSnackBar("Successfully registered")
         findNavController().navigateUp()
     }

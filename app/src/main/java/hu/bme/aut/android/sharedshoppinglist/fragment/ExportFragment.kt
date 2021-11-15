@@ -1,5 +1,6 @@
 package hu.bme.aut.android.sharedshoppinglist.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.core.util.Pair
@@ -11,10 +12,10 @@ import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ExportAdapter
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentExportListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.Export
-import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 import java.time.Instant
 import java.time.LocalDateTime
@@ -25,7 +26,7 @@ class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
     private val binding get() = _binding!!
     private lateinit var adapter: ExportAdapter
     private val args: ExportFragmentArgs by navArgs()
-    private lateinit var apiClient: ShoppingListClient
+    private val apiClient = ShoppingListApplication.apiClient
     private var lastSelected: Pair<Long, Long>? = null
 
     override fun onCreateView(
@@ -34,7 +35,6 @@ class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentExportListBinding.inflate(inflater, container, false)
-        apiClient = ShoppingListClient(requireContext())
         return binding.root
     }
 
@@ -90,6 +90,7 @@ class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showDatePicker() {
         val constraintsBuilder =
             CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now())
