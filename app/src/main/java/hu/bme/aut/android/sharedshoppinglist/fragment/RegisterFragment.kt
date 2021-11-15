@@ -11,7 +11,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentRegisterBinding
-import hu.bme.aut.android.sharedshoppinglist.network.RegisterModel
+import hu.bme.aut.android.sharedshoppinglist.network.model.RegisterModel
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
 import hu.bme.aut.android.sharedshoppinglist.util.requiredValid
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar

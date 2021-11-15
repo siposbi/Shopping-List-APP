@@ -11,6 +11,7 @@ import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
 import hu.bme.aut.android.sharedshoppinglist.network.apis.AuthAPI
 import hu.bme.aut.android.sharedshoppinglist.network.apis.ProductAPI
 import hu.bme.aut.android.sharedshoppinglist.network.apis.ShoppingListAPI
+import hu.bme.aut.android.sharedshoppinglist.network.model.*
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -81,6 +82,15 @@ class ShoppingListClient(context: Context) {
     ) {
         val registerRequest = authApi.register(registerModel)
         runCallOnBackgroundThread(registerRequest, onSuccess, onError)
+    }
+
+    fun refresh(
+        tokenModel: RefreshTokenModel,
+        onSuccess: (TokenModel) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val refreshRequest = authApi.refresh(tokenModel)
+        runCallOnBackgroundThread(refreshRequest, onSuccess, onError)
     }
 
     fun getShoppingLists(

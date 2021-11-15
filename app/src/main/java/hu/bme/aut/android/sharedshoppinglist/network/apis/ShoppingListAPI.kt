@@ -3,7 +3,7 @@ package hu.bme.aut.android.sharedshoppinglist.network.apis
 import hu.bme.aut.android.sharedshoppinglist.model.Export
 import hu.bme.aut.android.sharedshoppinglist.model.Member
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
-import hu.bme.aut.android.sharedshoppinglist.network.ResponseModel
+import hu.bme.aut.android.sharedshoppinglist.network.model.ResponseModel
 import retrofit2.Call
 import retrofit2.http.*
 import java.time.LocalDateTime

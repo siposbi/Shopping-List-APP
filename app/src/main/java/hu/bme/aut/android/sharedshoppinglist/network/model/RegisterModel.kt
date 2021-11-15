@@ -1,4 +1,4 @@
-package hu.bme.aut.android.sharedshoppinglist.network
+package hu.bme.aut.android.sharedshoppinglist.network.model
 
 data class RegisterModel(
     val firstName: String,

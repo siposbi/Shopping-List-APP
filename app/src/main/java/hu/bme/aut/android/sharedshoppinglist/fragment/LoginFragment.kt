@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentLoginBinding
-import hu.bme.aut.android.sharedshoppinglist.network.LoginModel
+import hu.bme.aut.android.sharedshoppinglist.network.model.LoginModel
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient
-import hu.bme.aut.android.sharedshoppinglist.network.TokenModel
+import hu.bme.aut.android.sharedshoppinglist.network.model.TokenModel
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 import hu.bme.aut.android.sharedshoppinglist.util.text
 
