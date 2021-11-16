@@ -27,8 +27,8 @@ class ShoppingListApplication : Application() {
             "shopping_list_database"
         ).fallbackToDestructiveMigration().build()
 
-        apiClient = ShoppingListClient(applicationContext)
         sessionManager = SessionManager(applicationContext)
+        apiClient = ShoppingListClient()
     }
 
 }

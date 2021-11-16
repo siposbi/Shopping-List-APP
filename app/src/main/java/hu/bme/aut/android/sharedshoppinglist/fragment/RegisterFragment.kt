@@ -55,7 +55,7 @@ class RegisterFragment : Fragment() {
             ) {
                 return@setOnClickListener
             }
-            apiClient.register(
+            apiClient.authRegister(
                 registerModel = RegisterModel(
                     firstName = binding.etFirstName.text,
                     lastName = binding.etLastName.text,

@@ -1,13 +1,11 @@
 package hu.bme.aut.android.sharedshoppinglist.network
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import hu.bme.aut.android.sharedshoppinglist.model.Export
-import hu.bme.aut.android.sharedshoppinglist.model.Member
-import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
+import hu.bme.aut.android.sharedshoppinglist.model.*
 import hu.bme.aut.android.sharedshoppinglist.network.apis.AuthAPI
 import hu.bme.aut.android.sharedshoppinglist.network.apis.ProductAPI
 import hu.bme.aut.android.sharedshoppinglist.network.apis.ShoppingListAPI
@@ -19,7 +17,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.time.LocalDateTime
 import kotlin.concurrent.thread
 
-class ShoppingListClient(context: Context) {
+class ShoppingListClient {
     companion object {
         const val BASE_URL = "https://shoppinglistapipz1pqy.azurewebsites.net/api/"
     }
@@ -27,7 +25,7 @@ class ShoppingListClient(context: Context) {
     private val authApi: AuthAPI
     private val shoppingListApi: ShoppingListAPI
     private val productApi: ProductAPI
-    var sessionManager: SessionManager = SessionManager(context)
+    private val sessionManager = ShoppingListApplication.sessionManager
 
     init {
         val moshi = Moshi.Builder()
@@ -66,95 +64,169 @@ class ShoppingListClient(context: Context) {
         }
     }
 
-    fun login(
+    fun authLogin(
         loginModel: LoginModel,
         onSuccess: (TokenModel) -> Unit,
         onError: (String) -> Unit
     ) {
-        val loginRequest = authApi.login(loginModel)
-        runCallOnBackgroundThread(loginRequest, onSuccess, onError)
+        val apiRequest = authApi.login(loginModel)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun register(
+    fun authRegister(
         registerModel: RegisterModel,
         onSuccess: (Long) -> Unit,
         onError: (String) -> Unit
     ) {
-        val registerRequest = authApi.register(registerModel)
-        runCallOnBackgroundThread(registerRequest, onSuccess, onError)
+        val apiRequest = authApi.register(registerModel)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun refresh(
+    fun authRefreshToken(
         tokenModel: RefreshTokenModel,
         onSuccess: (TokenModel) -> Unit,
         onError: (String) -> Unit
     ) {
-        val refreshRequest = authApi.refresh(tokenModel)
-        runCallOnBackgroundThread(refreshRequest, onSuccess, onError)
+        val apiRequest = authApi.refreshToken(tokenModel)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun getShoppingLists(
+    fun shoppingListGetListsForUser(
         onSuccess: (List<ShoppingList>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val getShoppingListsRequest = shoppingListApi.getShoppingLists()
-        runCallOnBackgroundThread(getShoppingListsRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.getAllForUser()
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun join(
+    fun shoppingListGet(
         shareCode: String,
         onSuccess: (ShoppingList) -> Unit,
         onError: (String) -> Unit
     ) {
-        val joinListRequest = shoppingListApi.join(shareCode)
-        runCallOnBackgroundThread(joinListRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.join(shareCode)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun leave(
+    fun shoppingListLeave(
         listId: Long,
         onSuccess: (Long) -> Unit,
         onError: (String) -> Unit
     ) {
-        val leaveListRequest = shoppingListApi.leave(listId)
-        runCallOnBackgroundThread(leaveListRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.leave(listId)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun rename(
+    fun shoppingListRename(
         listId: Long,
         newName: String,
         onSuccess: (ShoppingList) -> Unit,
         onError: (String) -> Unit
     ) {
-        val renameListRequest = shoppingListApi.rename(listId, newName)
-        runCallOnBackgroundThread(renameListRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.rename(listId, newName)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun create(
+    fun shoppingListCreate(
         name: String,
         onSuccess: (ShoppingList) -> Unit,
         onError: (String) -> Unit
     ) {
-        val createListRequest = shoppingListApi.create(name)
-        runCallOnBackgroundThread(createListRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.create(name)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun getMembers(
+    fun shoppingListGetMembers(
         listId: Long,
         onSuccess: (List<Member>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val getMembersRequest = shoppingListApi.getMembers(listId)
-        runCallOnBackgroundThread(getMembersRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.getMembers(listId)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
     }
 
-    fun getExport(
+    fun shoppingListGetExport(
         listId: Long,
         startDate: LocalDateTime,
         endDate: LocalDateTime,
         onSuccess: (List<Export>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val getExportRequest = shoppingListApi.getExport(listId, startDate, endDate)
-        runCallOnBackgroundThread(getExportRequest, onSuccess, onError)
+        val apiRequest = shoppingListApi.getExport(listId, startDate, endDate)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
+    }
+
+    fun productGet(
+        productId: Long,
+        onSuccess: (Product) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val apiRequest = productApi.get(productId)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
+    }
+
+    fun productCreate(
+        newProduct: ProductCreateModel,
+        onSuccess: (ProductMinimal) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val apiRequest = productApi.create(newProduct)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
+    }
+
+    fun productGetAllOfList(
+        listId: Long,
+        onSuccess: (List<ProductMinimal>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val apiRequest = productApi.getForList(listId)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
+    }
+
+    fun productDelete(
+        productId: Long,
+        onSuccess: (Long) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val apiRequest = productApi.delete(productId)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
+    }
+
+    fun productUndoDelete(
+        productId: Long,
+        onSuccess: (ProductMinimal) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val apiRequest = productApi.undoDelete(productId)
+        runCallOnBackgroundThread(apiRequest, onSuccess, onError)
+    }
+
+    fun productBuy(
+        productId: Long,
+        price: Long,
+        onSuccess: (ProductMinimal) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val getProductsRequest = productApi.buy(productId, price)
+        runCallOnBackgroundThread(getProductsRequest, onSuccess, onError)
+    }
+
+    fun productUndoBuy(
+        productId: Long,
+        onSuccess: (ProductMinimal) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val getProductsRequest = productApi.undoBuy(productId)
+        runCallOnBackgroundThread(getProductsRequest, onSuccess, onError)
+    }
+
+    fun productUpdate(
+        productId: Long,
+        newProduct: ProductUpdateModel,
+        onSuccess: (ProductMinimal) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val getProductsRequest = productApi.update(productId, newProduct)
+        runCallOnBackgroundThread(getProductsRequest, onSuccess, onError)
     }
 }

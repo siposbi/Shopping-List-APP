@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/product_name"
         android:padding="@dimen/padding_around_blocks"
+        app:counterEnabled="true"
         app:counterMaxLength="30"
         app:errorEnabled="true"
         app:helperText="@string/helper_text_required"
@@ -22,7 +23,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text" />
+            android:inputType="textFilter" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

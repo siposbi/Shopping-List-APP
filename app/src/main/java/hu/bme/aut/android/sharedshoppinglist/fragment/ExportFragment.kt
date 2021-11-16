@@ -134,7 +134,7 @@ class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
     }
 
     private fun getExport(startDate: Long, endDate: Long) {
-        apiClient.getExport(
+        apiClient.shoppingListGetExport(
             listId = args.shoppingListId,
             startDate = localDateTimeFromLong(startDate),
             endDate = localDateTimeFromLong(endDate),

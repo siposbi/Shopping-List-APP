@@ -1,5 +1,6 @@
 package hu.bme.aut.android.sharedshoppinglist.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -12,8 +13,12 @@ import hu.bme.aut.android.sharedshoppinglist.util.asDateTimeString
 import hu.bme.aut.android.sharedshoppinglist.util.submitAdd
 import hu.bme.aut.android.sharedshoppinglist.util.submitRemoveAt
 import hu.bme.aut.android.sharedshoppinglist.util.submitUpdateAt
+import java.time.LocalDateTime
 
-class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCardListener) :
+class ShoppingListAdapter(
+    private val shoppingListCardListener: ShoppingListCardListener,
+    private val context: Context
+) :
     ListAdapter<ShoppingList, ShoppingListAdapter.ViewHolder>(itemCallback) {
 
     private var shoppingListList = emptyList<ShoppingList>()
@@ -54,10 +59,16 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
 
         if (shoppingList.isShared) {
             holder.binding.ivIsSharedImage.setImageResource(R.drawable.ic_baseline_group_48)
+        } else {
+            holder.binding.ivIsSharedImage.setImageResource(R.drawable.ic_baseline_person_48)
         }
         holder.binding.tvName.text = shoppingList.name
         holder.binding.tvCreatedAt.text = shoppingList.createdDateTime.asDateTimeString
-        holder.binding.tvEditedAt.text = shoppingList.lastEditedDateTime.asDateTimeString
+        if (shoppingList.lastProductAddedDateTime == LocalDateTime.of(1, 1, 1, 0, 0, 0)) {
+            holder.binding.tvEditedAt.text = context.getString(R.string.no_products_yet)
+        } else {
+            holder.binding.tvEditedAt.text = shoppingList.lastProductAddedDateTime.asDateTimeString
+        }
     }
 
     fun setShoppingLists(shoppingLists: List<ShoppingList>) {
@@ -91,8 +102,8 @@ class ShoppingListAdapter(private val shoppingListCardListener: ShoppingListCard
         fun onItemLongClick(shoppingList: ShoppingList)
         fun onShareClick(shoppingList: ShoppingList)
         fun onDeleteClick(shoppingList: ShoppingList, position: Int)
-        fun scrollToTop()
         fun itemCountCallback(count: Int)
+        fun scrollToTop()
     }
 
     companion object {

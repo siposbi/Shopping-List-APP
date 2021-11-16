@@ -15,7 +15,6 @@ import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingList
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListRenameBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
-import hu.bme.aut.android.sharedshoppinglist.network.SessionManager
 import hu.bme.aut.android.sharedshoppinglist.util.*
 import kotlinx.coroutines.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
@@ -43,7 +42,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
         super.onViewCreated(view, bundle)
         setHasOptionsMenu(true)
 
-        adapter = ShoppingListAdapter(this)
+        adapter = ShoppingListAdapter(this, requireContext())
         binding.recyclerView.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.recyclerView.adapter = adapter
 
@@ -61,7 +60,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_logout -> {
-            SessionManager(requireContext()).logoutUser()
+            ShoppingListApplication.sessionManager.logoutUser()
             val action = ShoppingListFragmentDirections.actionShoppingListFragmentToLoginFragment()
             findNavController().navigate(action)
             true
@@ -78,20 +77,17 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
 
     private fun loadShoppingLists() {
         binding.recyclerView.showLoadingView()
-        apiClient.getShoppingLists(onSuccess = ::onListsLoaded, onError = ::onListLoadFailed)
+        apiClient.shoppingListGetListsForUser(
+            onSuccess = ::onListsLoaded,
+            onError = ::onListLoadFailed
+        )
     }
 
     private fun reloadShoppingLists() {
-        apiClient.getShoppingLists(onSuccess = ::onListsLoaded, onError = ::onListReloadFailed)
-    }
-
-    private fun showFabPrompt() {
-        MaterialTapTargetPrompt.Builder(this)
-            .setTarget(binding.fabExpandable)
-            .setPrimaryText(R.string.fab_prompt_no_lists_primary)
-            .setSecondaryText(R.string.fab_prompt_no_lists_secondary)
-            .setAppColors(requireContext())
-            .show()
+        apiClient.shoppingListGetListsForUser(
+            onSuccess = ::onListsLoaded,
+            onError = ::onListReloadFailed
+        )
     }
 
     private fun onListsLoaded(shoppingLists: List<ShoppingList>) {
@@ -106,6 +102,15 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     private fun onListReloadFailed(error: String) {
         binding.recyclerView.hideAllViews()
         showSnackBar(error, anchor = binding.fabExpandable)
+    }
+
+    private fun showFabPrompt() {
+        MaterialTapTargetPrompt.Builder(this)
+            .setTarget(binding.fabExpandable)
+            .setPrimaryText(R.string.fab_prompt_no_lists_primary)
+            .setSecondaryText(R.string.fab_prompt_no_lists_secondary)
+            .setAppColors(requireContext())
+            .show()
     }
 
     private fun initFab() {
@@ -138,7 +143,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
 
                 val shareCode = etJoinCode.text
 
-                apiClient.join(
+                apiClient.shoppingListGet(
                     shareCode = shareCode,
                     onSuccess = ::onListJoined,
                     onError = ::requestFailed
@@ -165,7 +170,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
                 if (!etShoppingListName.requiredAndLengthValid(requireContext(), 20))
                     return@setPositiveButtonOnShow
 
-                apiClient.create(
+                apiClient.shoppingListCreate(
                     name = etShoppingListName.text,
                     onSuccess = ::onListCreated,
                     onError = ::requestFailed
@@ -199,7 +204,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
     override fun onDeleteClick(shoppingList: ShoppingList, position: Int) {
         lastDeletedShareCode = shoppingList.shareCode
         lastDeletedPosition = position
-        apiClient.leave(
+        apiClient.shoppingListLeave(
             listId = shoppingList.id,
             onSuccess = ::onListLeft,
             onError = ::requestFailed
@@ -213,7 +218,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
             actionText = R.string.action_undo,
             action = {
                 lastDeletedShareCode?.let {
-                    apiClient.join(
+                    apiClient.shoppingListGet(
                         shareCode = it,
                         onSuccess = ::onListLeftUndo,
                         onError = ::requestFailed
@@ -247,7 +252,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
                     return@setPositiveButtonOnShow
                 }
 
-                apiClient.rename(
+                apiClient.shoppingListRename(
                     listId = shoppingList.id,
                     newName = newName,
                     onSuccess = ::onListRenamed,

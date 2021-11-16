@@ -14,7 +14,7 @@ interface ShoppingListAPI {
     }
 
     @GET("$SHOPPING_LIST/getAllForUser")
-    fun getShoppingLists(): Call<ResponseModel<List<ShoppingList>>>
+    fun getAllForUser(): Call<ResponseModel<List<ShoppingList>>>
 
     @POST("${SHOPPING_LIST}/create")
     fun create(@Body name: String): Call<ResponseModel<ShoppingList>>

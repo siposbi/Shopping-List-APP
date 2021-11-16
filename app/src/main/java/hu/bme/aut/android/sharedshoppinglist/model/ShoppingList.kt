@@ -8,6 +8,6 @@ data class ShoppingList(
     val numberOfProducts: Long,
     val shareCode: String,
     val createdDateTime: LocalDateTime,
-    val lastEditedDateTime: LocalDateTime,
+    val lastProductAddedDateTime: LocalDateTime,
     val isShared: Boolean
 )

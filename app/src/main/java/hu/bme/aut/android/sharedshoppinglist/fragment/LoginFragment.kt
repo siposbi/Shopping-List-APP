@@ -31,7 +31,7 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, bundle)
 
         binding.btnLogin.setOnClickListener {
-            apiClient.login(
+            apiClient.authLogin(
                 loginModel = LoginModel(
                     email = binding.etEmail.text,
                     password = binding.etPassword.text
@@ -56,7 +56,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun successfulLogin(tokenModel: TokenModel) {
-        apiClient.sessionManager.loginUser(tokenModel)
+        ShoppingListApplication.sessionManager.loginUser(tokenModel)
         val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
         findNavController().navigate(action)
     }

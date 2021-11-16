@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         if (sessionManager.getUserLoggedIn() && sessionManager.getAuthTokenValid()) {
             graph.startDestination = R.id.shoppingListFragment
         } else if (sessionManager.getRefreshAuthTokenValid()) {
-            apiClient.refresh(
+            apiClient.authRefreshToken(
                 tokenModel = sessionManager.getRefreshTokenModel(),
                 onSuccess = ::onRefreshTokenSuccess,
                 onError = ::tokenRefreshFail

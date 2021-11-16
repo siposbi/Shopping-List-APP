@@ -48,7 +48,7 @@ class MemberFragment : Fragment(), MemberAdapter.MemberAdapterListener {
 
     private fun loadMembers() {
         binding.recyclerView.showLoadingView()
-        apiClient.getMembers(
+        apiClient.shoppingListGetMembers(
             listId = args.shoppingListId,
             onSuccess = ::onMembersLoaded,
             onError = ::onMembersLoadFailed

@@ -1,7 +1,6 @@
 package hu.bme.aut.android.sharedshoppinglist.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -10,19 +9,25 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ProductAdapter
+import hu.bme.aut.android.sharedshoppinglist.databinding.DialogBuyProductBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogNewProductBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentProductListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ProductMinimal
+import hu.bme.aut.android.sharedshoppinglist.network.model.ProductCreateModel
+import hu.bme.aut.android.sharedshoppinglist.network.model.ProductUpdateModel
 import hu.bme.aut.android.sharedshoppinglist.util.*
-import kotlin.random.Random
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
-class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
-    ProductAdapter.OnInsertListener {
+class ProductListFragment : Fragment(), ProductAdapter.ProductListener {
     private var _binding: FragmentProductListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ProductAdapter
     private val args: ProductListFragmentArgs by navArgs()
+    private val apiClient = ShoppingListApplication.apiClient
+    private var lastInteractedProductId: Long? = null
+    private var lastInteractedProductPosition: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,44 +42,14 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         super.onViewCreated(view, bundle)
         setHasOptionsMenu(true)
 
-        adapter = ProductAdapter(requireContext())
-        binding.rvProducts.layoutManager = LinearLayoutManager(activity)
-        binding.rvProducts.adapter = adapter
-        adapter.setProducts(getProducts())
-        adapter.productListener = this
-        adapter.onInsertListener = this
+        adapter = ProductAdapter(this, requireContext())
+        binding.recyclerView.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.recyclerView.adapter = adapter
 
-        val swipeGesture = ProductSwipeGesture(
-            context = requireContext(),
-            leftSwipe = { position ->
-                // TODO DELETE with server, if successful, show snackbar with undo button
-                // TODO Pass user id
-                adapter.deleteProductByPosition(position, Unit)
-                Log.i("PRODUCT_A", "SWIPE LEFT")
-            },
-            rightSwipe = { position ->
-                // TODO Implement pass in current user id
-                adapter.purchaseProductByPosition(position, Unit)
-                Log.i("PRODUCT_A", "SWIPE RIGHT")
-            }
-        )
-
-        val touchHelper = ItemTouchHelper(swipeGesture)
-        touchHelper.attachToRecyclerView(binding.rvProducts)
-
-        binding.favAddProduct.setOnClickListener {
-            showNewProductDialog()
-
-            Log.i("PRODUCT_A", "ADD NEW")
-        }
-
-        //TODO API hívás, ha sikertelen snackbar üzenet.
-        binding.refreshLayout.setOnRefreshListener {
-            adapter.clear()
-            adapter.setProducts(getProducts())
-            Thread.sleep(1_000)
-            binding.refreshLayout.isRefreshing = false
-        }
+        initSwipeGesture()
+        loadProducts()
+        binding.fabAddProduct.setOnClickListener { showNewProductDialog() }
+        binding.recyclerView.refreshLayout.setOnRefreshListener { reloadProducts() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -84,8 +59,6 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_export -> {
-            // TODO viewmodel save
-            Log.i("PRODUCT_A", "EXPORT")
             val action = ProductListFragmentDirections.actionProductListFragmentToExportFragment(
                 shoppingListName = args.shoppingListName,
                 shoppingListId = args.shoppingListId
@@ -94,8 +67,6 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
             true
         }
         R.id.action_view_members -> {
-            // TODO viewmodel save
-            Log.i("PRODUCT_A", "MEMBERS")
             val action =
                 ProductListFragmentDirections.actionProductListFragmentToMemberListFragment(
                     shoppingListName = args.shoppingListName,
@@ -114,49 +85,124 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         _binding = null
     }
 
-    private fun getProducts(): List<ProductMinimal> {
-        return listOf(
-            ProductMinimal(
-                Random.nextLong(1000),
-                "Name ${Random.nextLong(1000)}",
-                "Name ${Random.nextLong(1000)}",
-                "Name ${Random.nextLong(1000)}",
-                Random.nextLong(1000),
-                Random.nextBoolean(),
-                Random.nextBoolean()
-            ),
-            ProductMinimal(
-                Random.nextLong(1000),
-                "Name ${Random.nextLong(1000)}",
-                "Name ${Random.nextLong(1000)}",
-                "Name ${Random.nextLong(1000)}",
-                Random.nextLong(1000),
-                Random.nextBoolean(),
-                Random.nextBoolean()
-            ),
+    private fun initSwipeGesture() {
+        val swipeGesture = ProductSwipeGesture(
+            context = requireContext(),
+            leftSwipe = { position ->
+                val product = adapter.getProductByAdapterPosition(position)
+                lastInteractedProductId = product.id
+                lastInteractedProductPosition = position
+                apiClient.productDelete(
+                    productId = product.id,
+                    onSuccess = ::onProductDeleted,
+                    onError = ::swipeRequestFailed
+                )
+            },
+            rightSwipe = { position ->
+                val product = adapter.getProductByAdapterPosition(position)
+                lastInteractedProductId = product.id
+                lastInteractedProductPosition = position
+                if (product.isBought) {
+                    apiClient.productUndoBuy(
+                        productId = product.id,
+                        onSuccess = ::onProductBoughtUndo,
+                        onError = ::swipeRequestFailed
+                    )
+                } else {
+                    purchaseProduct(product)
+                }
+            }
+        )
+
+        val touchHelper = ItemTouchHelper(swipeGesture)
+        touchHelper.attachToRecyclerView(binding.recyclerView.recyclerView)
+    }
+
+    private fun onProductDeleted(productId: Long) {
+        adapter.deleteProduct(productId)
+        showSnackBar(
+            title = R.string.product_deleted,
+            actionText = R.string.action_undo,
+            action = {
+                lastInteractedProductId?.let {
+                    apiClient.productUndoDelete(
+                        productId = it,
+                        onSuccess = ::onProductDeleteUndo,
+                        onError = ::requestFailed
+                    )
+                }
+            },
+            anchor = binding.fabAddProduct
         )
     }
 
-    override fun scrollToTop() {
-        binding.rvProducts.smoothScrollToPosition(0)
+    private fun onProductDeleteUndo(product: ProductMinimal) {
+        lastInteractedProductPosition?.let { adapter.addProduct(product, it) }
     }
 
-    // TODO edit
-    override fun onItemLongClick(product: ProductMinimal) {
-        // TODO CHANGE USER ID
-//        if (product.AddedByID != 2L) {
-//            showSnackBarFromAdapter(R.string.you_cant_edit)
-//        }
-
-        // TODO SHOW MODAL, SHAVE CHANGE, UPDATE VIEW IF SUCCESSFUL
-
-        Log.i("PRODUCT_A", "LONG CLICK ${product.name}")
-        product.let {
-//            Log.i("PRODUCT_A", "${product.name} PURCHASED BY ${product.BoughtByID}")
-        }
+    private fun onProductBought(product: ProductMinimal) {
+        adapter.updateProduct(product)
+        showSnackBar(
+            title = R.string.product_bought,
+            actionText = R.string.action_undo,
+            action = {
+                lastInteractedProductId?.let {
+                    apiClient.productUndoBuy(
+                        productId = it,
+                        onSuccess = ::onProductBoughtUndo,
+                        onError = ::requestFailed
+                    )
+                }
+            },
+            anchor = binding.fabAddProduct
+        )
     }
 
-    override fun onItemClicked(product: ProductMinimal) {
+    private fun onProductBoughtUndo(product: ProductMinimal) {
+        adapter.updateProduct(product)
+    }
+
+    private fun loadProducts() {
+        binding.recyclerView.showLoadingView()
+        apiClient.productGetAllOfList(
+            listId = args.shoppingListId,
+            onSuccess = ::onProductsLoaded,
+            onError = ::onProductLoadFailed
+        )
+    }
+
+    private fun reloadProducts() {
+        apiClient.productGetAllOfList(
+            listId = args.shoppingListId,
+            onSuccess = ::onProductsLoaded,
+            onError = ::onProductReloadFailed
+        )
+    }
+
+    private fun onProductsLoaded(products: List<ProductMinimal>) {
+        adapter.setProducts(products)
+    }
+
+    private fun onProductLoadFailed(error: String) {
+        binding.recyclerView.showErrorView()
+        showSnackBar(error, anchor = binding.fabAddProduct)
+    }
+
+    private fun onProductReloadFailed(error: String) {
+        binding.recyclerView.hideAllViews()
+        showSnackBar(error, anchor = binding.fabAddProduct)
+    }
+
+    private fun showFabPrompt() {
+        MaterialTapTargetPrompt.Builder(this)
+            .setTarget(binding.fabAddProduct)
+            .setPrimaryText(R.string.fab_prompt_no_products_primary)
+            .setSecondaryText(R.string.fab_prompt_no_products_secondary)
+            .setAppColors(requireContext())
+            .show()
+    }
+
+    override fun onItemClick(product: ProductMinimal) {
         val action = ProductListFragmentDirections.actionProductListFragmentToProductDetailFragment(
             productId = product.id,
             productName = product.name
@@ -164,33 +210,43 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         findNavController().navigate(action)
     }
 
-    // TODO Actually delete, if error, return false
-    override fun onItemDelete(product: ProductMinimal, position: Int): Boolean {
-        showSnackBar(
-            title = R.string.shopping_list_deleted,
-            anchor = binding.favAddProduct,
-            actionText = R.string.action_undo,
-            action = {
-                adapter.addProduct(product, position)
-            }
-        )
+    override fun onItemLongClick(product: ProductMinimal) {
+        val dialogBinding = DialogNewProductBinding.inflate(layoutInflater)
+        dialogBinding.etProductName.text = product.name
+        dialogBinding.etProductPrice.text =
+            product.price.getPriceAsStringWithoutSign(requireContext())
+        dialogBinding.smSharedItem.isChecked = product.isShared
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.alert_dialog_create_product_title)
+            .setView(dialogBinding.root)
+            .setPositiveButtonText(R.string.alert_dialog_edit)
+            .setDismissButton(R.string.alert_dialog_cancel)
+            .create()
+            .setPositiveButtonOnShow { dialog ->
+                val etProductName = dialogBinding.etProductName
+                if (!etProductName.requiredAndLengthValid(requireContext(), 30))
+                    return@setPositiveButtonOnShow
+                val etProductPrice = dialogBinding.etProductPrice
+                if (!etProductPrice.requiredValid(requireContext()))
+                    return@setPositiveButtonOnShow
 
-        Log.i("PRODUCT_A", "DELETED ${product.name}")
-        return true
+                apiClient.productUpdate(
+                    productId = product.id,
+                    newProduct = ProductUpdateModel(
+                        name = etProductName.text,
+                        price = etProductPrice.getPriceAsLong(),
+                        isShared = dialogBinding.smSharedItem.isChecked
+                    ),
+                    onSuccess = ::onProductUpdated,
+                    onError = ::requestFailed
+                )
+
+                dialog.dismiss()
+            }.show()
     }
 
-    override fun onItemPurchased(product: ProductMinimal): Boolean {
-        // TODO SEND PURCHASE TO SERVER
-        return true
-    }
-
-    override fun onItemPurchasedUndo(product: ProductMinimal): Boolean {
-        // TODO SEND UNDO PURCHASE TO SERVER
-        return true
-    }
-
-    override fun showSnackBarFromAdapter(resourceString: Int) {
-        showSnackBar(resourceString)
+    private fun onProductUpdated(product: ProductMinimal) {
+        adapter.updateProduct(product)
     }
 
     private fun showNewProductDialog() {
@@ -211,40 +267,73 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
                 if (!etProductPrice.requiredValid(requireContext()))
                     return@setPositiveButtonOnShow
 
-                val smSharedItem = dialogBinding.smSharedItem
-
-                val name = etProductName.text
-                val price = etProductPrice.text
-                val isShared = !smSharedItem.isSelected
-
-                // TODO set valid range for price
-
-
-                val separatorPosition = price.indexOf('.')
-
-                // todo check if price contains dot or not
-                val priceAsLong = (price.substring(0, separatorPosition) + price.substring(
-                    separatorPosition + 1,
-                    separatorPosition + 3
-                )).toLong()
-
-                // TODO Save with database, change data
-                val product = ProductMinimal(
-                    Random.nextLong(1000),
-                    "Name ${Random.nextLong(1000)}",
-                    "Name ${Random.nextLong(1000)}",
-                    "Name ${Random.nextLong(1000)}",
-                    Random.nextLong(1000),
-                    Random.nextBoolean(),
-                    Random.nextBoolean()
+                apiClient.productCreate(
+                    newProduct = ProductCreateModel(
+                        shoppingListId = args.shoppingListId,
+                        name = etProductName.text,
+                        price = etProductPrice.getPriceAsLong(),
+                        isShared = dialogBinding.smSharedItem.isChecked
+                    ),
+                    onSuccess = ::onProductCreated,
+                    onError = ::requestFailed
                 )
-
-                adapter.addProduct(product)
-
-
-                Log.i("SL_A", "created product: $name")
 
                 dialog.dismiss()
             }.show()
+    }
+
+    private fun onProductCreated(product: ProductMinimal) {
+        adapter.addProduct(product)
+    }
+
+    private fun purchaseProduct(product: ProductMinimal) {
+        val dialogBinding = DialogBuyProductBinding.inflate(layoutInflater)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(product.name)
+            .setView(dialogBinding.root)
+            .setPositiveButtonText(R.string.alert_dialog_edit)
+            .setNegativeButton(R.string.alert_dialog_cancel) { _, _ ->
+                lastInteractedProductPosition?.let { adapter.resetSwipe(it) }
+            }.setOnCancelListener {
+                lastInteractedProductPosition?.let { adapter.resetSwipe(it) }
+            }
+            .create()
+            .setPositiveButtonOnShow { dialog ->
+                val etProductPrice = dialogBinding.etProductPrice
+                if (!etProductPrice.requiredValid(requireContext()))
+                    return@setPositiveButtonOnShow
+
+                apiClient.productBuy(
+                    productId = product.id,
+                    price = dialogBinding.etProductPrice.getPriceAsLong(),
+                    onSuccess = ::onProductBought,
+                    onError = ::swipeRequestFailed
+                )
+
+                dialog.dismiss()
+            }.show()
+    }
+
+    private fun requestFailed(error: String) {
+        showSnackBar(error, anchor = binding.fabAddProduct)
+    }
+
+    private fun swipeRequestFailed(error: String) {
+        lastInteractedProductPosition?.let { adapter.resetSwipe(it) }
+        showSnackBar(error, anchor = binding.fabAddProduct)
+    }
+
+    override fun scrollToTop() {
+        binding.recyclerView.recyclerView.smoothScrollToPosition(0)
+    }
+
+    override fun itemCountCallback(count: Int) {
+        when (count) {
+            0 -> {
+                binding.recyclerView.showEmptyView()
+                showFabPrompt()
+            }
+            else -> binding.recyclerView.hideAllViews()
+        }
     }
 }

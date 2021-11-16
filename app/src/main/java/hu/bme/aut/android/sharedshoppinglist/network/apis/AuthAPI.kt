@@ -17,5 +17,5 @@ interface AuthAPI {
     fun register(@Body registerModel: RegisterModel): Call<ResponseModel<Long>>
 
     @POST("$AUTH/refresh")
-    fun refresh(@Body tokenModel: RefreshTokenModel): Call<ResponseModel<TokenModel>>
+    fun refreshToken(@Body tokenModel: RefreshTokenModel): Call<ResponseModel<TokenModel>>
 }
