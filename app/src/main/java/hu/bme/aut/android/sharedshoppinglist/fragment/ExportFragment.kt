@@ -19,6 +19,7 @@ import hu.bme.aut.android.sharedshoppinglist.model.Export
 import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
@@ -116,10 +117,11 @@ class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
             getExport(it.first, it.second)
             val date1 = localDateTimeFromLong(it.first)
             val date2 = localDateTimeFromLong(it.second)
-            val date1String =
-                getString(R.string.date_format, date1.year, date1.monthValue, date1.dayOfMonth)
-            val date2String =
-                getString(R.string.date_format, date2.year, date2.monthValue, date2.dayOfMonth)
+            val dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_format))
+            val date1String = dateTimeFormatter.format(date1)
+//                getString(R.string.date_format, date1.year, date1.monthValue, date1.dayOfMonth)
+            val date2String = dateTimeFormatter.format(date2)
+//                getString(R.string.date_format, date2.year, date2.monthValue, date2.dayOfMonth)
             binding.tvSelectedDate.text = "$date1String - $date2String"
             binding.banner.dismiss()
             adapter.clear()

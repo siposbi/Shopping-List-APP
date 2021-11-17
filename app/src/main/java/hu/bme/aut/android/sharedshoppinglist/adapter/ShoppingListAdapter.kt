@@ -63,11 +63,12 @@ class ShoppingListAdapter(
             holder.binding.ivIsSharedImage.setImageResource(R.drawable.ic_baseline_person_48)
         }
         holder.binding.tvName.text = shoppingList.name
-        holder.binding.tvCreatedAt.text = shoppingList.createdDateTime.asDateTimeString
+        holder.binding.tvCreatedAt.text = shoppingList.createdDateTime.asDateTimeString(context)
         if (shoppingList.lastProductAddedDateTime == LocalDateTime.of(1, 1, 1, 0, 0, 0)) {
             holder.binding.tvEditedAt.text = context.getString(R.string.no_products_yet)
         } else {
-            holder.binding.tvEditedAt.text = shoppingList.lastProductAddedDateTime.asDateTimeString
+            holder.binding.tvEditedAt.text =
+                shoppingList.lastProductAddedDateTime.asDateTimeString(context)
         }
     }
 

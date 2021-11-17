@@ -76,7 +76,8 @@
     <string name="choose_date_prompt">Choose date</string>
     <string name="no_date_selected_banner">Please choose a date to show shopping list export</string>
     <string name="no_date_selected">No date selected</string>
-    <string name="date_format">%1$d.%2$d.%3$d.</string>
+    <string name="date_format">yyyy.MM.dd</string>
+    <string name="date_time_format">yyyy.MM.dd HH:mm</string>
     <string name="product_deleted">Product Deleted</string>
     <string name="product_bought">Product Bought</string>
     <string name="alert_dialog_edit">Edit</string>

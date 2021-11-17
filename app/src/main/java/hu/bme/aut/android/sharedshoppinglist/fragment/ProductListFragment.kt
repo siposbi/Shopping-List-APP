@@ -48,6 +48,7 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener {
 
         initSwipeGesture()
         loadProducts()
+        binding.recyclerView.setOnRetryClickListener { loadProducts() }
         binding.fabAddProduct.setOnClickListener { showNewProductDialog() }
         binding.recyclerView.refreshLayout.setOnRefreshListener { reloadProducts() }
     }

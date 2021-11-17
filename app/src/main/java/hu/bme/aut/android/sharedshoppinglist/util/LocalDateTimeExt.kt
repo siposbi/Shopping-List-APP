@@ -1,10 +1,14 @@
 package hu.bme.aut.android.sharedshoppinglist.util
 
+import android.content.Context
+import hu.bme.aut.android.sharedshoppinglist.R
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-val LocalDateTime.asDateTimeString: String
-    get() = this.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
+fun LocalDateTime.asDateTimeString(context: Context): String {
+    return this.format(DateTimeFormatter.ofPattern(context.getString(R.string.date_time_format)))
+}
 
-val LocalDateTime.asDateString: String
-    get() = this.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+fun LocalDateTime.asDateString(context: Context): String {
+    return this.format(DateTimeFormatter.ofPattern(context.getString(R.string.date_format)))
+}

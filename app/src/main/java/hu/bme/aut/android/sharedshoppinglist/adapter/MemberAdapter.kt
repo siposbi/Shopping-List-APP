@@ -36,7 +36,7 @@ class MemberAdapter(
             context.getString(R.string.item_user_first_last_name, member.firstName, member.lastName)
         holder.binding.tvIsOwner.text =
             if (member.isOwner) context.getString(R.string.item_user_is_owner) else ""
-        val joinDateString = member.joinDateTime.asDateString
+        val joinDateString = member.joinDateTime.asDateString(context)
         holder.binding.tvJoinDate.text =
             context.getString(R.string.item_user_join_date, joinDateString)
     }

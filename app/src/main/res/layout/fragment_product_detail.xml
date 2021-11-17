@@ -2,92 +2,106 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".fragment.ProductDetailFragment">
 
-    <TextView
+    <include
+        android:id="@+id/loadingView"
+        layout="@layout/recycler_loading_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Product name"/>
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/errorView"
+        layout="@layout/recycler_error_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="Péksütemény"/>
+        android:text="Product name"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Added by"/>
+        android:text="Péksütemény"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="Balázs Sipos"/>
+        android:text="Added by"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Bought by"/>
+        android:text="Balázs Sipos"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="Balázs Sipos"/>
+        android:text="Bought by"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Added on"/>
+        android:text="Balázs Sipos"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="2021.10.31"/>
+        android:text="Added on"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Bought on"/>
+        android:text="2021.10.31"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="2021.11.02"/>
+        android:text="Bought on"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Is shared"/>
+        android:text="2021.11.02"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="Yes"/>
+        android:text="Is shared"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="Price"/>
+        android:text="Yes"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:text="$20"/>
+        android:text="Price"
+        android:textAppearance="?attr/textAppearanceHeadline5" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="$20"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
 </LinearLayout>
