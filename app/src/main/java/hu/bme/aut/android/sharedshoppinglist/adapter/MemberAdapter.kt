@@ -16,7 +16,7 @@ class MemberAdapter(
     private val memberAdapterListener: MemberAdapterListener,
     private val context: Context
 ) :
-    ListAdapter<Member, MemberAdapter.ViewHolder>(itemCallback) {
+    ListAdapter<Member, MemberAdapter.ViewHolder>(ItemCallback) {
 
     private var members = emptyList<Member>()
 
@@ -52,7 +52,7 @@ class MemberAdapter(
     }
 
     companion object {
-        object itemCallback : DiffUtil.ItemCallback<Member>() {
+        object ItemCallback : DiffUtil.ItemCallback<Member>() {
             override fun areItemsTheSame(oldItem: Member, newItem: Member): Boolean {
                 return oldItem.userId == newItem.userId
             }

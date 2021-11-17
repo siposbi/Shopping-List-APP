@@ -2,7 +2,6 @@ package hu.bme.aut.android.sharedshoppinglist
 
 import android.app.Application
 import androidx.room.Room
-import hu.bme.aut.android.sharedshoppinglist.database.ShoppingListDao
 import hu.bme.aut.android.sharedshoppinglist.database.ShoppingListDatabase
 import hu.bme.aut.android.sharedshoppinglist.network.SessionManager
 import hu.bme.aut.android.sharedshoppinglist.network.ShoppingListClient

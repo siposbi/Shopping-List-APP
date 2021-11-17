@@ -15,7 +15,7 @@ import hu.bme.aut.android.sharedshoppinglist.util.submitRemoveAt
 import hu.bme.aut.android.sharedshoppinglist.util.submitUpdateAt
 
 class ProductAdapter(private val productListener: ProductListener, private val context: Context) :
-    ListAdapter<ProductMinimal, ProductAdapter.ViewHolder>(itemCallback) {
+    ListAdapter<ProductMinimal, ProductAdapter.ViewHolder>(ItemCallback) {
 
     private var products = emptyList<ProductMinimal>()
 
@@ -110,7 +110,7 @@ class ProductAdapter(private val productListener: ProductListener, private val c
     }
 
     companion object {
-        object itemCallback : DiffUtil.ItemCallback<ProductMinimal>() {
+        object ItemCallback : DiffUtil.ItemCallback<ProductMinimal>() {
             override fun areItemsTheSame(
                 oldItem: ProductMinimal,
                 newItem: ProductMinimal

@@ -15,7 +15,7 @@ class ExportAdapter(
     private val exportAdapterListener: ExportAdapterListener,
     private val context: Context
 ) :
-    ListAdapter<Export, ExportAdapter.ViewHolder>(itemCallback) {
+    ListAdapter<Export, ExportAdapter.ViewHolder>(ItemCallback) {
 
     private var exports = emptyList<Export>()
 
@@ -56,7 +56,7 @@ class ExportAdapter(
     }
 
     companion object {
-        object itemCallback : DiffUtil.ItemCallback<Export>() {
+        object ItemCallback : DiffUtil.ItemCallback<Export>() {
             override fun areItemsTheSame(oldItem: Export, newItem: Export): Boolean {
                 return oldItem == newItem
             }

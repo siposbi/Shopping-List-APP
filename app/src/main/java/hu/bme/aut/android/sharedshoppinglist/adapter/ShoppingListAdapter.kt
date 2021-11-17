@@ -19,7 +19,7 @@ class ShoppingListAdapter(
     private val shoppingListCardListener: ShoppingListCardListener,
     private val context: Context
 ) :
-    ListAdapter<ShoppingList, ShoppingListAdapter.ViewHolder>(itemCallback) {
+    ListAdapter<ShoppingList, ShoppingListAdapter.ViewHolder>(ItemCallback) {
 
     private var shoppingListList = emptyList<ShoppingList>()
 
@@ -108,7 +108,7 @@ class ShoppingListAdapter(
     }
 
     companion object {
-        object itemCallback : DiffUtil.ItemCallback<ShoppingList>() {
+        object ItemCallback : DiffUtil.ItemCallback<ShoppingList>() {
             override fun areItemsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
                 return oldItem.id == newItem.id
             }

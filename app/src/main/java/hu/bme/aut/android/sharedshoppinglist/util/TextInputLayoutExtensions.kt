@@ -15,6 +15,7 @@ fun TextInputLayout.requiredValid(context: Context): Boolean {
     return checkAndShowIfRequiredFilled(context)
 }
 
+@Suppress("unused")
 fun TextInputLayout.lengthValid(context: Context, maximum: Int): Boolean {
     editText?.doAfterTextChanged {
         if (checkAndShowIfLengthValid(context, maximum))
