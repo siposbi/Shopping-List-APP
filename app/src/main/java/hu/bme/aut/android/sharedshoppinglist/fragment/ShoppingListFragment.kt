@@ -65,6 +65,16 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
             findNavController().navigate(action)
             true
         }
+        R.id.action_user_info -> {
+            showSnackBar(
+                requireContext().getString(
+                    R.string.logged_in_email,
+                    ShoppingListApplication.sessionManager.getUserEmail()!!
+                ),
+                anchor = binding.fabExpandable
+            )
+            true
+        }
         else -> {
             super.onOptionsItemSelected(item)
         }

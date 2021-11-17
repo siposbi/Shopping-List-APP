@@ -56,7 +56,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun successfulLogin(tokenModel: TokenModel) {
-        ShoppingListApplication.sessionManager.loginUser(tokenModel)
+        ShoppingListApplication.sessionManager.loginUser(tokenModel, binding.etEmail.text)
         val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
         findNavController().navigate(action)
     }

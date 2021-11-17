@@ -1,5 +1,8 @@
 package hu.bme.aut.android.sharedshoppinglist
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -23,12 +26,39 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         installSplashScreen()
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.banner.setRightButtonAction { binding.banner.dismiss() }
+        setNetworkCallback()
+        setStartingFragment()
+        setSupportActionBar(binding.toolbar)
+
+        val appBarConfiguration =
+            AppBarConfiguration.Builder(R.id.loginFragment, R.id.shoppingListFragment).build()
+        setupActionBarWithNavController(navController, appBarConfiguration)
+    }
+
+    private fun setNetworkCallback() {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        cm.registerDefaultNetworkCallback(
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    super.onAvailable(network)
+                    runOnUiThread { binding.banner.dismiss() }
+                }
+
+                override fun onLost(network: Network) {
+                    super.onLost(network)
+                    runOnUiThread { binding.banner.show() }
+                }
+            }
+        )
+    }
+
+    private fun setStartingFragment() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val inflater = navHostFragment.navController.navInflater
@@ -50,13 +80,6 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().setPrimaryNavigationFragment(navHostFragment)
             .commit()
         navController = navHostFragment.navController
-
-        setSupportActionBar(binding.toolbar)
-
-        val appBarConfiguration =
-            AppBarConfiguration.Builder(R.id.loginFragment, R.id.shoppingListFragment).build()
-
-        setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
     override fun onSupportNavigateUp(): Boolean {

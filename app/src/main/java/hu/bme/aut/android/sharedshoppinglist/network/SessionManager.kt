@@ -19,15 +19,17 @@ class SessionManager(context: Context) {
         const val USER_LOGGED_IN = "user_logged_in"
         const val TOKEN_VALID_UNTIL = "token_valid_until"
         const val REFRESH_TOKEN_VALID_UNTIL = "refresh_token_valid_until"
+        const val USER_EMAIL = "current_user_email"
     }
 
     fun fetchAuthToken(): String? {
         return prefs.getString(USER_JWT_TOKEN, null)
     }
 
-    fun loginUser(tokenModel: TokenModel) {
+    fun loginUser(tokenModel: TokenModel, email: String? = null) {
         with(prefs.edit()) {
             putBoolean(USER_LOGGED_IN, true)
+            putString(USER_EMAIL, email)
             putString(USER_JWT_TOKEN, tokenModel.token)
             putString(USER_REFRESH_TOKEN, tokenModel.refreshToken)
             putString(TOKEN_VALID_UNTIL, dateTimeFormatter.toJson(tokenModel.tokenValidUntil))
@@ -69,5 +71,9 @@ class SessionManager(context: Context) {
             token = prefs.getString(USER_JWT_TOKEN, "")!!,
             refreshToken = prefs.getString(USER_REFRESH_TOKEN, "")!!
         )
+    }
+
+    fun getUserEmail(): String? {
+        return prefs.getString(USER_EMAIL, null)
     }
 }

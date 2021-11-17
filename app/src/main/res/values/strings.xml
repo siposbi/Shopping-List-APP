@@ -83,4 +83,8 @@
     <string name="alert_dialog_purchase">Purchase</string>
     <string name="alert_dialog_create_product_title">Create product</string>
     <string name="no_products_yet">no products yet</string>
+    <string name="action_info">User Details</string>
+    <string name="logged_in_email">"Email: %1$s"</string>
+    <string name="no_network_available">No network available. \nPlease turn it on to continue using this app.</string>
+    <string name="dismiss">Dismiss</string>
 </resources>
