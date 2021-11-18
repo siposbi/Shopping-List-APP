@@ -50,6 +50,7 @@ class ProductDetailFragment : Fragment() {
 
     private fun onProductLoaded(product: Product) {
         binding.loadingView.root.visibility = View.GONE
+        binding.errorView.root.visibility = View.GONE
         // TODO Set view from data
     }
 
