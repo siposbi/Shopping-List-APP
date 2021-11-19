@@ -2,6 +2,7 @@ package hu.bme.aut.android.sharedshoppinglist.fragment
 
 import android.content.*
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -10,6 +11,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ShoppingListAdapter
+import hu.bme.aut.android.sharedshoppinglist.database.ChangeLog
+import hu.bme.aut.android.sharedshoppinglist.database.RoomShoppingList
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListCreateBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListJoinCodeBinding
 import hu.bme.aut.android.sharedshoppinglist.databinding.DialogInputShoppingListRenameBinding
@@ -102,6 +105,7 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
 
     private fun onListsLoaded(shoppingLists: List<ShoppingList>) {
         adapter.setShoppingLists(shoppingLists)
+        loadItemsInBackground(shoppingLists)
     }
 
     private fun onListLoadFailed(error: String) {
@@ -129,13 +133,6 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
         binding.fabOptionCreate.fabOptionIcon?.setTint(requireActivity().getColor(R.color.secondaryTextColor))
         binding.fabOptionCreate.setOnClickListener { showCreateDialog() }
         binding.fabOptionJoin.setOnClickListener { showJoinDialog() }
-    }
-
-    // TODO check if items loaded from network match this, if not show dialog
-    private fun loadItemsInBackground() = launch {
-        val items = withContext(Dispatchers.IO) {
-            database.getAllShoppingLists()
-        }
     }
 
     private fun showJoinDialog() {
@@ -275,6 +272,38 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
 
     private fun onListRenamed(shoppingList: ShoppingList) {
         adapter.updateShoppingList(shoppingList)
+    }
+
+    private fun loadItemsInBackground(nShoppingLists: List<ShoppingList>) = launch {
+        withContext(Dispatchers.IO) {
+            val dbShoppingLists = database.getAllShoppingLists()
+
+            dbShoppingLists.forEach { dbSL ->
+                if (nShoppingLists.none { nSL -> nSL.id == dbSL.id })
+                    database.deleteShoppingListById(dbSL.id)
+            }
+
+            val changelogs = mutableListOf<ChangeLog>()
+            nShoppingLists.forEach { nSl ->
+                val dbList = dbShoppingLists.singleOrNull { dbSl ->
+                    dbSl.id == nSl.id
+                }
+                if (dbList == null){
+                    database.insertShoppingList(RoomShoppingList(nSl.id, nSl.numberOfProducts))
+                    return@forEach
+                }
+                if (nSl.numberOfProducts != dbList.numberOfProducts)
+                    changelogs.add(ChangeLog(nSl.name, dbList.numberOfProducts, nSl.numberOfProducts))
+                database.updateShoppingList(dbList.id, nSl.numberOfProducts)
+            }
+
+            showChangesDialog(changelogs)
+        }
+    }
+
+    private fun showChangesDialog(changelogs: MutableList<ChangeLog>) {
+        for (cl in changelogs)
+            Log.i("CHANGE_LIST", cl.toString())
     }
 
     private fun requestFailed(error: String) {

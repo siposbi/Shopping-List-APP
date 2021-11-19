@@ -18,14 +18,17 @@ import hu.bme.aut.android.sharedshoppinglist.model.ProductMinimal
 import hu.bme.aut.android.sharedshoppinglist.network.model.ProductCreateModel
 import hu.bme.aut.android.sharedshoppinglist.network.model.ProductUpdateModel
 import hu.bme.aut.android.sharedshoppinglist.util.*
+import kotlinx.coroutines.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
-class ProductListFragment : Fragment(), ProductAdapter.ProductListener {
+class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
+    CoroutineScope by MainScope() {
     private var _binding: FragmentProductListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ProductAdapter
     private val args: ProductListFragmentArgs by navArgs()
     private val apiClient = ShoppingListApplication.apiClient
+    private val database = ShoppingListApplication.shoppingListDatabase.shoppingListDao()
     private var lastInteractedProductId: Long? = null
     private var lastInteractedProductPosition: Int? = null
 
@@ -135,10 +138,12 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener {
             },
             anchor = binding.fabAddProduct
         )
+        deleteFromDb()
     }
 
     private fun onProductDeleteUndo(product: ProductMinimal) {
         lastInteractedProductPosition?.let { adapter.addProduct(product, it) }
+        addToDb()
     }
 
     private fun onProductBought(product: ProductMinimal) {
@@ -285,6 +290,7 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener {
 
     private fun onProductCreated(product: ProductMinimal) {
         adapter.addProduct(product)
+        addToDb()
     }
 
     private fun purchaseProduct(product: ProductMinimal) {
@@ -313,6 +319,14 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener {
 
                 dialog.dismiss()
             }.show()
+    }
+
+    private fun deleteFromDb() = launch {
+        withContext(Dispatchers.IO) { database.deleteProduct(args.shoppingListId) }
+    }
+
+    private fun addToDb() = launch {
+        withContext(Dispatchers.IO) { database.addProduct(args.shoppingListId) }
     }
 
     private fun requestFailed(error: String) {

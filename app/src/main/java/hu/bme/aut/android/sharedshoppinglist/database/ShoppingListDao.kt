@@ -9,17 +9,23 @@ import androidx.room.Update
 interface ShoppingListDao {
 
     @Insert
-    fun insertShoppingList(shoppingList: RoomShoppingList)
+    suspend fun insertShoppingList(shoppingList: RoomShoppingList)
 
     @Query("SELECT * FROM shopping_list")
-    fun getAllShoppingLists(): List<RoomShoppingList>
+    suspend fun getAllShoppingLists(): List<RoomShoppingList>
 
     @Update
-    fun updateShoppingList(shoppingList: RoomShoppingList)
+    suspend fun updateShoppingList(shoppingList: RoomShoppingList)
 
     @Query("UPDATE shopping_list SET numberOfProducts = :numberOfProducts WHERE id = :id")
-    fun updateShoppingList(id: Long, numberOfProducts: Long)
+    suspend fun updateShoppingList(id: Long, numberOfProducts: Long)
+
+    @Query("UPDATE shopping_list SET numberOfProducts = (SELECT numberOfProducts FROM shopping_list) - 1 WHERE id = :shoppingListId")
+    suspend fun deleteProduct(shoppingListId: Long)
+
+    @Query("UPDATE shopping_list SET numberOfProducts = (SELECT numberOfProducts FROM shopping_list) + 1 WHERE id = :shoppingListId")
+    suspend fun addProduct(shoppingListId: Long)
 
     @Query("DELETE FROM shopping_list WHERE id = :shoppingListId")
-    fun deleteShoppingListById(shoppingListId: Long)
+    suspend fun deleteShoppingListById(shoppingListId: Long)
 }
