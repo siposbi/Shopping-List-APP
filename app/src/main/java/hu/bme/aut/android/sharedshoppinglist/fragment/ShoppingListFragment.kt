@@ -2,7 +2,6 @@ package hu.bme.aut.android.sharedshoppinglist.fragment
 
 import android.content.*
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -288,22 +287,36 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.ShoppingListCardLis
                 val dbList = dbShoppingLists.singleOrNull { dbSl ->
                     dbSl.id == nSl.id
                 }
-                if (dbList == null){
+                if (dbList == null) {
                     database.insertShoppingList(RoomShoppingList(nSl.id, nSl.numberOfProducts))
                     return@forEach
                 }
                 if (nSl.numberOfProducts != dbList.numberOfProducts)
-                    changelogs.add(ChangeLog(nSl.name, dbList.numberOfProducts, nSl.numberOfProducts))
+                    changelogs.add(
+                        ChangeLog(
+                            nSl.name,
+                            dbList.numberOfProducts,
+                            nSl.numberOfProducts
+                        )
+                    )
                 database.updateShoppingList(dbList.id, nSl.numberOfProducts)
             }
 
-            showChangesDialog(changelogs)
+            if (changelogs.isNotEmpty())
+                requireActivity().runOnUiThread { showChangesDialog(changelogs) }
         }
     }
 
     private fun showChangesDialog(changelogs: MutableList<ChangeLog>) {
-        for (cl in changelogs)
-            Log.i("CHANGE_LIST", cl.toString())
+        var msg = "Some of your lists had been updates since the last time\n\n"
+        changelogs.forEach { cl ->
+            msg = msg.plus("List: ${cl.listName}\n Was: ${cl.oldCnt.toString().padStart(3)} Now: ${cl.newCnt.toString().padStart(3)}\n")
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.list_change_dialog_title)
+            .setMessage(msg)
+            .setDismissButton(R.string.alert_dialog_ok)
+            .show()
     }
 
     private fun requestFailed(error: String) {
