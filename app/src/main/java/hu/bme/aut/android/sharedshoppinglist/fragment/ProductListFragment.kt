@@ -1,5 +1,6 @@
 package hu.bme.aut.android.sharedshoppinglist.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -293,12 +294,19 @@ class ProductListFragment : Fragment(), ProductAdapter.ProductListener,
         addToDb()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun purchaseProduct(product: ProductMinimal) {
         val dialogBinding = DialogBuyProductBinding.inflate(layoutInflater)
+        dialogBinding.etProductPrice.text =
+            product.price.getPriceAsStringWithoutSign(requireContext())
+        dialogBinding.etProductPrice.editText?.setOnTouchListener { _, _ ->
+            dialogBinding.etProductPrice.text = ""
+            false
+        }
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(product.name)
             .setView(dialogBinding.root)
-            .setPositiveButtonText(R.string.alert_dialog_edit)
+            .setPositiveButtonText(R.string.alert_dialog_purchase)
             .setNegativeButton(R.string.alert_dialog_cancel) { _, _ ->
                 lastInteractedProductPosition?.let { adapter.resetSwipe(it) }
             }.setOnCancelListener {

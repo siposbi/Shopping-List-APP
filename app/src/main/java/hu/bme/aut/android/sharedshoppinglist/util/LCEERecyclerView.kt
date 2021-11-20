@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package hu.bme.aut.android.sharedshoppinglist.util
 
 import android.content.Context

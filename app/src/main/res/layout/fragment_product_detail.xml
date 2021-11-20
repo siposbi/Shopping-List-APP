@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,87 +22,154 @@
         android:visibility="gone" />
 
     <TextView
+        android:id="@+id/tvProductName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Product name"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:layout_height="150dp"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Croissant" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvAddedByLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Péksütemény"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:gravity="center"
+        android:text="@string/added_by"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        app:layout_constraintEnd_toStartOf="@id/tvBoughtByLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvProductName" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvBoughtByLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Added by"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:gravity="center"
+        android:text="@string/bought_by"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvAddedByLabel"
+        app:layout_constraintTop_toBottomOf="@id/tvProductName" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvAddedBy"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Balázs Sipos"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:gravity="center"
+        android:paddingBottom="@dimen/tv_bottom_padding"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:layout_constraintEnd_toStartOf="@id/tvBoughtBy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAddedByLabel"
+        tools:text="Balázs Sipos" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvBoughtBy"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Bought by"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:gravity="center"
+        android:paddingBottom="@dimen/tv_bottom_padding"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvAddedBy"
+        app:layout_constraintTop_toBottomOf="@id/tvBoughtByLabel"
+        tools:text="Balázs Sipos" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvAddedOnLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Balázs Sipos"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:gravity="center"
+        android:text="@string/added_on"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        app:layout_constraintEnd_toStartOf="@id/tvBoughtOnLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAddedBy" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvBoughtOnLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Added on"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:gravity="center"
+        android:text="@string/bought_on"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvAddedOnLabel"
+        app:layout_constraintTop_toBottomOf="@id/tvBoughtBy" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvAddedOn"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="2021.10.31"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:gravity="center"
+        android:paddingBottom="@dimen/tv_bottom_padding"
+        android:text="@string/bought_on"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:layout_constraintEnd_toStartOf="@id/tvBoughtOn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAddedOnLabel"
+        tools:text="2021.10.31" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvBoughtOn"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Bought on"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:gravity="center"
+        android:paddingBottom="@dimen/tv_bottom_padding"
+        android:text="@string/bought_on"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvAddedOn"
+        app:layout_constraintTop_toBottomOf="@id/tvBoughtOnLabel"
+        tools:text="2021.11.02" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvIsSharedLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="2021.11.02"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:gravity="center"
+        android:text="@string/is_shared"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        app:layout_constraintEnd_toStartOf="@id/tvPriceLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAddedOn" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvPriceLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Is shared"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:gravity="center"
+        android:text="@string/price"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvIsSharedLabel"
+        app:layout_constraintTop_toBottomOf="@id/tvBoughtOn" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvIsShared"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Yes"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:gravity="center"
+        android:paddingBottom="@dimen/tv_bottom_padding"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:layout_constraintEnd_toStartOf="@id/tvPrice"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvIsSharedLabel"
+        tools:text="No" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvPrice"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Price"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:gravity="center"
+        android:paddingBottom="@dimen/tv_bottom_padding"
+        android:textAppearance="?attr/textAppearanceBody1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvIsShared"
+        app:layout_constraintTop_toBottomOf="@+id/tvPriceLabel"
+        tools:text="$20" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="$20"
-        android:textAppearance="?attr/textAppearanceBody1" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

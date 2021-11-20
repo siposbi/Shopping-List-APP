@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Shopping List</string>
-    <string name="cd_loading">LOADING</string>
     <string name="login_button">LOGIN</string>
     <string name="password_edit_text">Password</string>
     <string name="email_edit_text">Email</string>
@@ -8,13 +7,12 @@
     <string name="last_name_edit_text">Last Name</string>
     <string name="first_name_edit_text">First Name</string>
     <string name="helper_text_password">Minimum 8 characters</string>
-    <string name="password_error">Password must be at least 8 charaters long.</string>
+    <string name="password_error">Password must be at least 8 characters long.</string>
     <string name="shopping_list_name_placeholder">Name is not set</string>
     <string name="created_at_placeholder">Creation time not set</string>
     <string name="last_edited_at_placeholder">Last item added is not set</string>
     <string name="action_share">Share</string>
     <string name="action_delete">Delete</string>
-    <string name="shopping_list_created_at">Created at: %1$s</string>
     <string name="created_at">Created at:</string>
     <string name="last_item_added">Last item added:</string>
     <string name="image_view_is_shared_content_description">Image to represent if the list has more than one owner</string>
@@ -36,8 +34,6 @@
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="alert_dialog_join_shopping_list_title">Join shopping list</string>
     <string name="join_code_edit_text">Join code</string>
-    <string name="you_cant_delete">You did\'t add this product, so you can\'t delete it</string>
-    <string name="you_cant_purchase">You did\'t buy this product, so you can\'t undo buying it</string>
     <string name="alert_dialog_create_shopping_list_title">Create shopping list</string>
     <string name="shopping_list_name_edit_text">Shopping list name</string>
     <string name="alert_dialog_create">Create</string>
@@ -47,9 +43,6 @@
     <string name="item_user_first_last_name">%1$s %2$s</string>
     <string name="item_user_is_owner">Owner</string>
     <string name="item_user_join_date">Joined: %1$s</string>
-    <string name="title_members">%1$s members</string>
-    <string name="title_export">%1$s export</string>
-    <string name="title_products">%1$s items</string>
     <string name="item_member_export_price">%1$s%2$s%3$s%4$s</string>
     <string name="export_explanation_positive_balance">Can take money out</string>
     <string name="export_explanation_negative_balance">Has to put money in</string>
@@ -57,14 +50,12 @@
     <string name="date_selector_title">Select date of export</string>
     <string name="for_selected_member">"For %1$s"</string>
     <string name="for_everyone">For everyone</string>
-    <string name="you_cant_edit">You did\'t add this product, so you can\'t edit it</string>
     <string name="dollar_sign">$</string>
     <string name="shared_item">Shared item</string>
     <string name="product_name">Name</string>
     <string name="product_price">Price</string>
     <string name="alert_dialog_add_product">Add product</string>
     <string name="alertdialog_add">Add</string>
-    <string name="action_save_export">Save as JSON</string>
     <string name="max_length">Value too long</string>
     <string name="fab_prompt_no_lists_primary">You don\'t have any lists</string>
     <string name="fab_prompt_no_products_primary">You don\'t have any products</string>
@@ -89,4 +80,13 @@
     <string name="no_network_available">No network available. \nPlease turn it on to continue using this app.</string>
     <string name="dismiss">Dismiss</string>
     <string name="list_change_dialog_title">Some changes have been found</string>
+    <string name="added_by">Added by</string>
+    <string name="bought_by">Bought by</string>
+    <string name="added_on">Added on</string>
+    <string name="bought_on">Bought on</string>
+    <string name="is_shared">Is shared</string>
+    <string name="price">Price</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="dash">-</string>
 </resources>
