@@ -5,20 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.fragment.findNavController
-import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentLoginBinding
-import hu.bme.aut.android.sharedshoppinglist.util.setUserLoggedIn
+import hu.bme.aut.android.sharedshoppinglist.network.model.LoginModel
+import hu.bme.aut.android.sharedshoppinglist.network.model.TokenModel
+import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
+import hu.bme.aut.android.sharedshoppinglist.util.text
 
 class LoginFragment : Fragment() {
-    companion object {
-        const val LOGIN_SUCCESSFUL: String = "LOGIN_SUCCESSFUL"
-    }
-
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var savedStateHandle: SavedStateHandle
+    private val apiClient = ShoppingListApplication.apiClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,16 +31,20 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, bundle)
 
         binding.btnLogin.setOnClickListener {
-            // TODO Login via backend.
-            requireActivity().setUserLoggedIn(true)
-            val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
-            findNavController().navigate(action)
+            apiClient.authLogin(
+                loginModel = LoginModel(
+                    email = binding.etEmail.text,
+                    password = binding.etPassword.text
+                ),
+                onSuccess = ::successfulLogin,
+                onError = ::failedLogin
+            )
         }
 
         binding.btnRegister.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToRegisterFragment(
-                email = binding.etEmail.editText?.text.toString(),
-                password = binding.etPassword.editText?.text.toString()
+                email = binding.etEmail.text,
+                password = binding.etPassword.text
             )
             findNavController().navigate(action)
         }
@@ -51,5 +53,15 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun successfulLogin(tokenModel: TokenModel) {
+        ShoppingListApplication.sessionManager.loginUser(tokenModel, binding.etEmail.text)
+        val action = LoginFragmentDirections.actionLoginFragmentToShoppingListFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun failedLogin(error: String) {
+        showSnackBar(error)
     }
 }

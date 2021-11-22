@@ -59,7 +59,7 @@
         android:id="@+id/exportFragment"
         android:name="hu.bme.aut.android.sharedshoppinglist.fragment.ExportFragment"
         android:label="Export: {shoppingListName}"
-        tools:layout="@layout/fragment_export">
+        tools:layout="@layout/fragment_export_list">
         <argument
             android:name="shoppingListName"
             app:argType="string" />
@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/memberListFragment"
-        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.MemberListFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.MemberFragment"
         android:label="Members: {shoppingListName}"
         tools:layout="@layout/fragment_member_list">
         <argument
@@ -98,11 +98,30 @@
             app:exitAnim="@anim/slide_out_bottom"
             app:popEnterAnim="@anim/slide_in_bottom"
             app:popExitAnim="@anim/slide_out_top" />
+        <action
+            android:id="@+id/action_productListFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_bottom"
+            app:popEnterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_top" />
         <argument
             android:name="shoppingListName"
             app:argType="string" />
         <argument
             android:name="shoppingListId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="hu.bme.aut.android.sharedshoppinglist.fragment.ProductDetailFragment"
+        android:label="{productName}"
+        tools:layout="@layout/fragment_product_detail">
+        <argument
+            android:name="productName"
+            app:argType="string" />
+        <argument
+            android:name="productId"
             app:argType="long" />
     </fragment>
 </navigation>

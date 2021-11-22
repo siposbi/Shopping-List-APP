@@ -10,17 +10,23 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:text="@string/product_name_placeholder"
         android:textAppearance="?attr/textAppearanceHeadline6"
-        app:layout_constraintEnd_toStartOf="@id/tvPrice"
+        app:layout_constraintBottom_toTopOf="@id/tvPrice"
+        app:layout_constraintEnd_toStartOf="@id/ivIsBought"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="wrap"
+        app:layout_constraintWidth_percent="0.7" />
 
     <ImageView
         android:id="@+id/ivIsBought"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:contentDescription="@string/image_view_is_bought_content_description"
         app:layout_constraintStart_toEndOf="@id/tvName"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,21 +35,11 @@
         android:id="@+id/tvPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:text="@string/product_price_placeholder"
-        app:layout_constraintEnd_toStartOf="@id/ivIsSharedImage"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/tvBoughtOn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:text="@string/added_on_date_placeholder"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/product_price_placeholder"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvPrice"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvName" />
 
     <ImageView
         android:id="@+id/ivIsSharedImage"

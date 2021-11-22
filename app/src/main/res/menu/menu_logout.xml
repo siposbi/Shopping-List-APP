@@ -3,9 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_user_info"
+        android:icon="@drawable/ic_baseline_info_48"
+        android:title="@string/action_info"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_logout"
         android:icon="@drawable/baseline_logout_48"
         android:title="@string/action_logout"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom" />
 
 </menu>

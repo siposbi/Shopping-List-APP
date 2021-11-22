@@ -1,38 +1,41 @@
 package hu.bme.aut.android.sharedshoppinglist.fragment
 
-import android.icu.text.SimpleDateFormat
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.adapter.ExportAdapter
-import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentExportBinding
+import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentExportListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.Export
+import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.random.Random
 
-// TODO Amíg nincs váalsztva semmi, mutassa, hogy válasszunk üzenetet
-// TODO Loading charging icon, de ezt mondjuk mindenhová kéne
-class ExportFragment : Fragment() {
-    private var _binding: FragmentExportBinding? = null
+class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
+    private var _binding: FragmentExportListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ExportAdapter
     private val args: ExportFragmentArgs by navArgs()
+    private val apiClient = ShoppingListApplication.apiClient
+    private var lastSelected: Pair<Long, Long>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentExportBinding.inflate(inflater, container, false)
+        _binding = FragmentExportListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -40,18 +43,16 @@ class ExportFragment : Fragment() {
         super.onViewCreated(view, bundle)
         setHasOptionsMenu(true)
 
-        adapter = ExportAdapter(requireContext())
-        binding.rvExportsList.layoutManager = LinearLayoutManager(activity)
-        binding.rvExportsList.adapter = adapter
+        adapter = ExportAdapter(this, requireContext())
+        binding.recyclerView.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.recyclerView.adapter = adapter
 
-        binding.banner.setLeftButtonAction { binding.banner.dismiss() }
-        binding.banner.setRightButtonAction  {
-            showDatePicker()
-            // TODO CHECK IS SELECTED
-            binding.banner.dismiss()
-        }
-
+        binding.banner.setRightButtonAction { showDatePicker() }
         binding.banner.show()
+        binding.recyclerView.setOnRetryClickListener {
+            lastSelected?.let { getExport(it.first, it.second) }
+        }
+        binding.recyclerView.showEmptyView(getString(R.string.no_date_selected))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -64,10 +65,6 @@ class ExportFragment : Fragment() {
             showDatePicker()
             true
         }
-        R.id.action_save_export -> {
-            // TODO SAVE FILE (persze csak ha van mint menteni amúgy)
-            true
-        }
         else -> {
             super.onOptionsItemSelected(item)
         }
@@ -78,43 +75,26 @@ class ExportFragment : Fragment() {
         _binding = null
     }
 
-    private fun getExports(): List<Export> {
-        return listOf(
-            Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
-                "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
-            ),
-            Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
-                "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
-            ),
-            Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
-                "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
-            ),
-            Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
-                "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
-            ),
-            Export(
-                Random.nextLong(100),
-                Random.nextLong(-2000, 2000),
-                "FN${Random.nextInt(10)}",
-                "LN${Random.nextInt(10)}"
-            )
-        )
+    private fun onExportsLoaded(exports: List<Export>) {
+        adapter.setExports(exports)
     }
 
-    private fun showDatePicker(){
-        val constraintsBuilder = CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now())
+    private fun onExportsLoadFailed(error: String) {
+        binding.recyclerView.showErrorView()
+        showSnackBar(error, length = Snackbar.LENGTH_LONG)
+    }
+
+    override fun itemCountCallback(count: Int) {
+        when (count) {
+            0 -> binding.recyclerView.showEmptyView()
+            else -> binding.recyclerView.hideAllViews()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showDatePicker() {
+        val constraintsBuilder =
+            CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now())
 
         val dateRangePicker =
             MaterialDatePicker.Builder.dateRangePicker()
@@ -131,13 +111,35 @@ class ExportFragment : Fragment() {
         dateRangePicker.show(parentFragmentManager, "DATE_RANGE_PICKER_DIALOG")
 
         dateRangePicker.addOnPositiveButtonClickListener {
-            val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-            val date1 = Date(it.first)
-            Log.i("EA_SELECTED", format.format(date1))
-            val date2 = Date(it.second)
-            Log.i("EA_SELECTED", format.format(date2))
+            binding.recyclerView.showLoadingView()
+            binding.tvSelectedDate.visibility = View.VISIBLE
+            lastSelected = it
+            getExport(it.first, it.second)
+            val date1 = localDateTimeFromLong(it.first)
+            val date2 = localDateTimeFromLong(it.second)
+            val dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_format))
+            val date1String = dateTimeFormatter.format(date1)
+            val date2String = dateTimeFormatter.format(date2)
+            binding.tvSelectedDate.text = "$date1String - $date2String"
+            binding.banner.dismiss()
             adapter.clear()
-            adapter.setExports(getExports())
         }
+    }
+
+    private fun localDateTimeFromLong(epochMilli: Long): LocalDateTime {
+        return LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(epochMilli),
+            TimeZone.getDefault().toZoneId()
+        )
+    }
+
+    private fun getExport(startDate: Long, endDate: Long) {
+        apiClient.shoppingListGetExport(
+            listId = args.shoppingListId,
+            startDate = localDateTimeFromLong(startDate),
+            endDate = localDateTimeFromLong(endDate),
+            onSuccess = ::onExportsLoaded,
+            onError = ::onExportsLoadFailed
+        )
     }
 }

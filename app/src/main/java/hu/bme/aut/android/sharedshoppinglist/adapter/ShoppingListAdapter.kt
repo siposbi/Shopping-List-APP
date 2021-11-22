@@ -1,27 +1,50 @@
 package hu.bme.aut.android.sharedshoppinglist.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.android.sharedshoppinglist.R
 import hu.bme.aut.android.sharedshoppinglist.databinding.ItemShoppingListBinding
 import hu.bme.aut.android.sharedshoppinglist.model.ShoppingList
+import hu.bme.aut.android.sharedshoppinglist.util.asDateTimeString
+import hu.bme.aut.android.sharedshoppinglist.util.submitAdd
+import hu.bme.aut.android.sharedshoppinglist.util.submitRemoveAt
 import hu.bme.aut.android.sharedshoppinglist.util.submitUpdateAt
-import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
 
-class ShoppingListAdapter :
-    ListAdapter<ShoppingList, ShoppingListAdapter.ViewHolder>(itemCallback) {
+class ShoppingListAdapter(
+    private val shoppingListCardListener: ShoppingListCardListener,
+    private val context: Context
+) :
+    ListAdapter<ShoppingList, ShoppingListAdapter.ViewHolder>(ItemCallback) {
 
     private var shoppingListList = emptyList<ShoppingList>()
 
-    lateinit var onInsertListener: OnInsertListener
+    inner class ViewHolder(val binding: ItemShoppingListBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var shoppingList: ShoppingList? = null
 
-    var itemCardListener: ShoppingListItemCardListener? = null
+        init {
+            itemView.setOnClickListener {
+                shoppingList?.let { shoppingListCardListener.onItemClick(it) }
+            }
+            itemView.setOnLongClickListener {
+                shoppingList?.let { shoppingListCardListener.onItemLongClick(it) }
+                true
+            }
+            binding.btnShare.setOnClickListener {
+                shoppingList?.let { shoppingListCardListener.onShareClick(it) }
+            }
+            binding.btnDelete.setOnClickListener {
+                shoppingList?.let {
+                    shoppingListCardListener.onDeleteClick(it, absoluteAdapterPosition)
+                }
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
@@ -36,85 +59,62 @@ class ShoppingListAdapter :
 
         if (shoppingList.isShared) {
             holder.binding.ivIsSharedImage.setImageResource(R.drawable.ic_baseline_group_48)
+        } else {
+            holder.binding.ivIsSharedImage.setImageResource(R.drawable.ic_baseline_person_48)
         }
-        holder.binding.tvName.text = shoppingList.Name
-        holder.binding.tvCreatedAt.text =
-            shoppingList.CreatedAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
-        holder.binding.tvEditedAt.text =
-            shoppingList.LastEditedAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
+        holder.binding.tvName.text = shoppingList.name
+        holder.binding.tvCreatedAt.text = shoppingList.createdDateTime.asDateTimeString(context)
+        if (shoppingList.lastProductAddedDateTime == LocalDateTime.of(1, 1, 1, 0, 0, 0)) {
+            holder.binding.tvEditedAt.text = context.getString(R.string.no_products_yet)
+        } else {
+            holder.binding.tvEditedAt.text =
+                shoppingList.lastProductAddedDateTime.asDateTimeString(context)
+        }
     }
 
     fun setShoppingLists(shoppingLists: List<ShoppingList>) {
-        shoppingListList += shoppingLists
+        shoppingListList = shoppingLists
         submitList(shoppingListList)
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
-    fun deleteShoppingList(shoppingList: ShoppingList) {
-        shoppingListList -= shoppingList
-        submitList(shoppingListList)
+    fun deleteShoppingList(shoppingListId: Long) {
+        val index = shoppingListList.indexOfFirst { sl -> sl.id == shoppingListId }
+        shoppingListList = submitRemoveAt(shoppingListList, index)
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
-    fun updateShoppingListWithIndex(shoppingList: ShoppingList, index: Int) {
+    fun updateShoppingList(shoppingList: ShoppingList) {
+        val index = shoppingListList.indexOfFirst { sl -> sl.id == shoppingList.id }
         shoppingListList = submitUpdateAt(shoppingListList, shoppingList, index)
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
     fun addShoppingList(shoppingList: ShoppingList, position: Int = 0) {
-        val tmpList = shoppingListList.toMutableList()
-        tmpList.add(position, shoppingList)
-        shoppingListList = tmpList
-        submitList(shoppingListList)
+        shoppingListList = submitAdd(shoppingListList, shoppingList, position)
         if (position == 0) {
-            onInsertListener.scrollToTop()
+            shoppingListCardListener.scrollToTop()
         }
+        shoppingListCardListener.itemCountCallback(shoppingListList.count())
     }
 
-    inner class ViewHolder(val binding: ItemShoppingListBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        var shoppingList: ShoppingList? = null
-
-        init {
-            itemView.setOnClickListener {
-                shoppingList?.let { itemCardListener?.onItemClick(it) }
-            }
-            binding.btnShare.setOnClickListener {
-                shoppingList?.let { itemCardListener?.onShareClick(it) }
-            }
-            binding.btnDelete.setOnClickListener {
-                shoppingList?.let {
-                    itemCardListener?.onDeleteClick(it, absoluteAdapterPosition)
-                }
-            }
-            binding.tvName.setOnLongClickListener {
-                shoppingList?.let {
-                    itemCardListener?.onNameLongClock(
-                        it.copy(),
-                        absoluteAdapterPosition
-                    )
-                }
-                true
-            }
-        }
-    }
-
-    interface ShoppingListItemCardListener {
+    interface ShoppingListCardListener {
         fun onItemClick(shoppingList: ShoppingList)
+        fun onItemLongClick(shoppingList: ShoppingList)
         fun onShareClick(shoppingList: ShoppingList)
         fun onDeleteClick(shoppingList: ShoppingList, position: Int)
-        fun onNameLongClock(shoppingList: ShoppingList, index: Int)
-    }
-
-    interface OnInsertListener {
+        fun itemCountCallback(count: Int)
         fun scrollToTop()
     }
 
     companion object {
-        object itemCallback : DiffUtil.ItemCallback<ShoppingList>() {
+        object ItemCallback : DiffUtil.ItemCallback<ShoppingList>() {
             override fun areItemsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-                return oldItem.ID == newItem.ID
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-                return oldItem.Name == newItem.Name
+                return oldItem.name == newItem.name
             }
         }
     }

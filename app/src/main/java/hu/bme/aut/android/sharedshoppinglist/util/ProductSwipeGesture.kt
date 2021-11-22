@@ -2,14 +2,10 @@ package hu.bme.aut.android.sharedshoppinglist.util
 
 import android.content.Context
 import android.graphics.Canvas
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.android.sharedshoppinglist.R
-import hu.bme.aut.android.sharedshoppinglist.adapter.ProductAdapter
-import hu.bme.aut.android.sharedshoppinglist.model.Product
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
 
@@ -24,12 +20,16 @@ class ProductSwipeGesture(
     private val deleteIcon = R.drawable.ic_baseline_delete_24
     private val purchaseIcon = R.drawable.ic_baseline_add_shopping_cart_24
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) : Boolean {
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
         return false
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        when(direction){
+        when (direction) {
             ItemTouchHelper.LEFT -> {
                 leftSwipe(viewHolder.absoluteAdapterPosition)
             }
@@ -39,8 +39,24 @@ class ProductSwipeGesture(
         }
     }
 
-    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-        RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive        )
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        RecyclerViewSwipeDecorator.Builder(
+            c,
+            recyclerView,
+            viewHolder,
+            dX,
+            dY,
+            actionState,
+            isCurrentlyActive
+        )
             .addSwipeLeftBackgroundColor(deleteColor)
             .addSwipeLeftActionIcon(deleteIcon)
             .addSwipeRightBackgroundColor(purchaseColor)

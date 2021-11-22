@@ -1,6 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="FullscreenAttrs">
         <attr name="fullscreenBackgroundColor" format="color" />
         <attr name="fullscreenTextColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="LCEERecyclerView">
+        <attr name="errorText" format="string" />
+        <attr name="errorIcon" format="reference" />
+        <attr name="emptyText" format="string" />
+        <attr name="emptyIcon" format="reference" />
+        <attr name="refreshable" format="boolean" />
     </declare-styleable>
 </resources>

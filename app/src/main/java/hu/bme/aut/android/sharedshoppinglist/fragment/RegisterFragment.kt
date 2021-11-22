@@ -10,14 +10,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
+import hu.bme.aut.android.sharedshoppinglist.ShoppingListApplication
 import hu.bme.aut.android.sharedshoppinglist.databinding.FragmentRegisterBinding
-import hu.bme.aut.android.sharedshoppinglist.util.checkAndShowIfRequiredFilled
-import hu.bme.aut.android.sharedshoppinglist.util.clearErrorIfRequiredValid
+import hu.bme.aut.android.sharedshoppinglist.network.model.RegisterModel
+import hu.bme.aut.android.sharedshoppinglist.util.requiredValid
+import hu.bme.aut.android.sharedshoppinglist.util.showSnackBar
+import hu.bme.aut.android.sharedshoppinglist.util.text
 
 class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
     private val args: RegisterFragmentArgs by navArgs()
+    private val apiClient = ShoppingListApplication.apiClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,47 +43,54 @@ class RegisterFragment : Fragment() {
         _binding = null
     }
 
-    private fun initForm(){
-        binding.etEmail.editText?.setText(args.email)
-        binding.etPassword.editText?.setText(args.password)
+    private fun initForm() {
+        args.email?.let { binding.etEmail.text = it }
+        args.password?.let { binding.etPassword.text = it }
 
         binding.btnRegister.setOnClickListener {
-            if (!binding.etFirstName.checkAndShowIfRequiredFilled(requireActivity()) or
-                !binding.etLastName.checkAndShowIfRequiredFilled(requireActivity()) or
-                !binding.etEmail.checkAndShowIfRequiredFilled(requireActivity()) or
-                !binding.etPassword.checkAndShowIfRequiredFilled(requireActivity())
+            if (!binding.etFirstName.requiredValid(requireActivity()) or
+                !binding.etLastName.requiredValid(requireActivity()) or
+                !binding.etEmail.requiredValid(requireActivity()) or
+                !binding.etPassword.passwordValid()
             ) {
                 return@setOnClickListener
             }
-
-            // TODO Register via backend.
-
-            findNavController().navigateUp()
-        }
-
-        binding.etPassword.editText?.doAfterTextChanged {
-            if (binding.etPassword.error != null && checkIfPasswordIsValidAndShow(binding.etPassword)) {
-                binding.etPassword.error = null
-            }
-        }
-
-        binding.etFirstName.editText?.doAfterTextChanged {
-            binding.etFirstName.clearErrorIfRequiredValid(requireActivity())
-        }
-        binding.etLastName.editText?.doAfterTextChanged {
-            binding.etLastName.clearErrorIfRequiredValid(requireActivity())
-        }
-        binding.etEmail.editText?.doAfterTextChanged {
-            binding.etEmail.clearErrorIfRequiredValid(requireActivity())
+            apiClient.authRegister(
+                registerModel = RegisterModel(
+                    firstName = binding.etFirstName.text,
+                    lastName = binding.etLastName.text,
+                    email = binding.etEmail.text,
+                    password = binding.etPassword.text
+                ),
+                onSuccess = ::successfulRegistration,
+                onError = ::failedRegistration
+            )
         }
     }
 
-    private fun checkIfPasswordIsValidAndShow(textInput: TextInputLayout): Boolean {
-        if (binding.etPassword.editText!!.text.toString().length >= 8) {
+    private fun TextInputLayout.passwordValid(): Boolean {
+        editText?.doAfterTextChanged {
+            if (checkAndShowIfPasswordValid())
+                error = null
+        }
+        return checkAndShowIfPasswordValid()
+    }
+
+    private fun TextInputLayout.checkAndShowIfPasswordValid(): Boolean {
+        if (this.text.length >= 8) {
             return true
         }
-        textInput.error = getString(R.string.password_error)
+        error = getString(R.string.password_error)
         return false
+    }
+
+    private fun successfulRegistration(@Suppress("UNUSED_PARAMETER") id: Long) {
+        showSnackBar("Successfully registered")
+        findNavController().navigateUp()
+    }
+
+    private fun failedRegistration(error: String) {
+        showSnackBar(error)
     }
 
 }
