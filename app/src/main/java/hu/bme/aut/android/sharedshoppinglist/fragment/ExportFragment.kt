@@ -119,9 +119,7 @@ class ExportFragment : Fragment(), ExportAdapter.ExportAdapterListener {
             val date2 = localDateTimeFromLong(it.second)
             val dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_format))
             val date1String = dateTimeFormatter.format(date1)
-//                getString(R.string.date_format, date1.year, date1.monthValue, date1.dayOfMonth)
             val date2String = dateTimeFormatter.format(date2)
-//                getString(R.string.date_format, date2.year, date2.monthValue, date2.dayOfMonth)
             binding.tvSelectedDate.text = "$date1String - $date2String"
             binding.banner.dismiss()
             adapter.clear()
