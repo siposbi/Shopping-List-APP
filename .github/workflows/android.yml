@@ -50,16 +50,17 @@ jobs:
         with:
           name: Release artifact
           path: app/build/outputs/apk/ourbuildtype/release/app-artifact-*.apk
-            - name: Create Release
-              id: create_release
-              uses: actions/create-release@v1
-              env:
-                GITHUB_TOKEN: ${{ secrets.GHA_T }}
-              with:
-                tag_name: ${{ github.ref }}
-                release_name: Release ${{ github.ref }}
-                draft: false
-                prerelease: false
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
       - name: Save name of our Artifact
         id: set-result-artifact
