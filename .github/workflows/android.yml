@@ -31,7 +31,7 @@ jobs:
 
       - name: Sign artifact
         id: signArtifact
-        uses: thomastvedt/sign-android-release@v2.2
+        uses: r0adkll/sign-android-release@v1
         with:
           releaseDirectory: app/build/outputs/apk/release
           alias: ${{ secrets.KEYALIAS }}
