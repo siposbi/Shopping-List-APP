@@ -1,10 +1,10 @@
 package hu.bme.aut.android.sharedshoppinglist.util
 
 import android.content.Context
-import android.icu.text.DecimalFormatSymbols
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.textfield.TextInputLayout
 import hu.bme.aut.android.sharedshoppinglist.R
+import java.lang.Exception
 
 
 fun TextInputLayout.requiredValid(context: Context): Boolean {
@@ -58,11 +58,20 @@ var TextInputLayout.text: String
     }
 
 fun TextInputLayout.getPriceAsLong(): Long {
-    val separatorPosition = text.indexOf(DecimalFormatSymbols.getInstance().decimalSeparator)
+    var separatorPosition = -1
+    if (text.contains('.'))
+        separatorPosition = text.indexOf('.')
+    else if (text.contains(','))
+        separatorPosition = text.indexOf(',')
+
     if (separatorPosition == -1)
         return text.toLong() * 100
 
     val dollars = text.substring(0, separatorPosition)
-    val cents = text.substring(separatorPosition + 1, separatorPosition + 3)
+    val cents = try {
+        text.substring(separatorPosition + 1, separatorPosition + 3)
+    } catch (ex: Exception) {
+        text.substring(separatorPosition + 1, separatorPosition + 2) + "0"
+    }
     return ("$dollars$cents").toLong()
 }
